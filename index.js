@@ -50,6 +50,7 @@ const messageButtonHtml = `
 let currentPopup = null;
 let currentMessageIndex = -1;
 let currentSwipeIndex = 0;
+let currentViewMode = 'both'; // 'both', 'original', 'translation'
 
 /**
  * LLM Translator DB 열기
@@ -207,7 +208,28 @@ async function createSwipeViewerPopup(messageIndex) {
                     <button class="swipe-nav-btn swipe-prev" title="이전 스와이프" ${currentSwipeIndex === 0 ? 'disabled' : ''}>
                         &lt;
                     </button>
-                    <div class="swipe-viewer-nav-spacer"></div>
+                    <div class="swipe-viewer-controls">
+                        <div class="view-mode-dropdown ${hasTranslation ? '' : 'disabled'}" title="표시 모드 선택">
+                            <button class="view-mode-btn">
+                                <span class="view-mode-text">${getViewModeText(currentViewMode)}</span>
+                                <i class="fa-solid fa-chevron-down view-mode-arrow"></i>
+                            </button>
+                            <div class="view-mode-menu">
+                                <div class="view-mode-option ${currentViewMode === 'both' ? 'active' : ''}" data-mode="both">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    <span>원문/번역문 보기</span>
+                                </div>
+                                <div class="view-mode-option ${currentViewMode === 'original' ? 'active' : ''}" data-mode="original">
+                                    <i class="fa-solid fa-file-text"></i>
+                                    <span>원문만 보기</span>
+                                </div>
+                                <div class="view-mode-option ${currentViewMode === 'translation' ? 'active' : ''}" data-mode="translation" ${hasTranslation ? '' : 'style="display:none"'}>
+                                    <i class="fa-solid fa-language"></i>
+                                    <span>번역문만 보기</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
                         &gt;
                     </button>
@@ -230,28 +252,60 @@ async function createSwipeViewerPopup(messageIndex) {
 }
 
 /**
- * 스와이프 콘텐츠 HTML 생성 (번역문 유무에 따라 다르게)
+ * 뷰 모드 텍스트 반환
+ */
+function getViewModeText(mode) {
+    switch (mode) {
+        case 'both': return '원문/번역문 보기';
+        case 'original': return '원문만 보기';
+        case 'translation': return '번역문만 보기';
+        default: return '원문/번역문 보기';
+    }
+}
+
+/**
+ * 스와이프 콘텐츠 HTML 생성 (번역문 유무 및 뷰 모드에 따라 다르게)
  */
 function createSwipeContentHTML(originalText, translation, hasTranslation) {
-    if (hasTranslation) {
-        return `
-            <div class="swipe-text-container dual-view">
-                <div class="swipe-text-section">
-                    <label class="swipe-text-label">원문</label>
-                    <textarea readonly class="swipe-text-area original-text">${originalText}</textarea>
-                </div>
-                <div class="swipe-text-section">
-                    <label class="swipe-text-label">번역문</label>
-                    <textarea readonly class="swipe-text-area translation-text">${translation}</textarea>
-                </div>
-            </div>
-        `;
-    } else {
+    // 번역문이 없으면 원문만 표시
+    if (!hasTranslation) {
         return `
             <div class="swipe-text-container single-view">
                 <textarea readonly class="swipe-text-area single-text">${originalText}</textarea>
             </div>
         `;
+    }
+    
+    // 번역문이 있을 때 뷰 모드에 따라 결정
+    switch (currentViewMode) {
+        case 'original':
+            return `
+                <div class="swipe-text-container single-view">
+                    <label class="swipe-text-label">원문</label>
+                    <textarea readonly class="swipe-text-area original-text single-mode">${originalText}</textarea>
+                </div>
+            `;
+        case 'translation':
+            return `
+                <div class="swipe-text-container single-view">
+                    <label class="swipe-text-label">번역문</label>
+                    <textarea readonly class="swipe-text-area translation-text single-mode">${translation}</textarea>
+                </div>
+            `;
+        case 'both':
+        default:
+            return `
+                <div class="swipe-text-container dual-view">
+                    <div class="swipe-text-section">
+                        <label class="swipe-text-label">원문</label>
+                        <textarea readonly class="swipe-text-area original-text">${originalText}</textarea>
+                    </div>
+                    <div class="swipe-text-section">
+                        <label class="swipe-text-label">번역문</label>
+                        <textarea readonly class="swipe-text-area translation-text">${translation}</textarea>
+                    </div>
+                </div>
+            `;
     }
 }
 
@@ -286,6 +340,33 @@ function setupPopupEventHandlers() {
     // 다음 스와이프 버튼
     modal.find('.swipe-next').on('click', () => {
         navigateSwipe(1);
+    });
+    
+    // 뷰 모드 드롭다운 토글
+    modal.find('.view-mode-btn').on('click', (e) => {
+        e.stopPropagation();
+        const dropdown = modal.find('.view-mode-dropdown');
+        dropdown.toggleClass('open');
+    });
+    
+    // 뷰 모드 옵션 선택
+    modal.find('.view-mode-option').on('click', async (e) => {
+        const option = $(e.currentTarget);
+        const newMode = option.data('mode');
+        
+        if (newMode !== currentViewMode) {
+            currentViewMode = newMode;
+            await updateSwipeDisplay();
+        }
+        
+        modal.find('.view-mode-dropdown').removeClass('open');
+    });
+    
+    // 드롭다운 외부 클릭 시 닫기
+    modal.on('click', (e) => {
+        if (!$(e.target).closest('.view-mode-dropdown').length) {
+            modal.find('.view-mode-dropdown').removeClass('open');
+        }
     });
     
     // 키보드 네비게이션
@@ -335,6 +416,32 @@ async function updateSwipeDisplay() {
     const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
     modal.find('.swipe-viewer-content').html(contentHTML);
     
+    // 뷰 모드 드롭다운 상태 업데이트
+    const dropdown = modal.find('.view-mode-dropdown');
+    dropdown.toggleClass('disabled', !hasTranslation);
+    
+    // 뷰 모드 텍스트 업데이트
+    modal.find('.view-mode-text').text(getViewModeText(currentViewMode));
+    
+    // 활성 옵션 업데이트
+    modal.find('.view-mode-option').removeClass('active');
+    modal.find(`.view-mode-option[data-mode="${currentViewMode}"]`).addClass('active');
+    
+    // 번역문 옵션 표시/숨김
+    const translationOption = modal.find('.view-mode-option[data-mode="translation"]');
+    if (hasTranslation) {
+        translationOption.show();
+    } else {
+        translationOption.hide();
+        // 번역문이 없는데 번역문만 보기 모드면 원문/번역문 보기로 변경
+        if (currentViewMode === 'translation') {
+            currentViewMode = 'both';
+            modal.find('.view-mode-text').text(getViewModeText(currentViewMode));
+            modal.find('.view-mode-option').removeClass('active');
+            modal.find('.view-mode-option[data-mode="both"]').addClass('active');
+        }
+    }
+    
     // 네비게이션 버튼 상태 업데이트
     modal.find('.swipe-prev').prop('disabled', currentSwipeIndex === 0);
     modal.find('.swipe-next').prop('disabled', currentSwipeIndex >= swipeData.swipes.length - 1);
@@ -360,6 +467,7 @@ function closeSwipeViewerPopup() {
     
     currentMessageIndex = -1;
     currentSwipeIndex = 0;
+    currentViewMode = 'both'; // 뷰 모드 초기화
 }
 
 /**

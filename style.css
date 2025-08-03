@@ -166,12 +166,115 @@
     box-shadow: none;
 }
 
-/* 네비게이션 스페이서 (중앙 공간) */
-.swipe-viewer-nav-spacer {
+/* 네비게이션 컨트롤 (중앙 영역) */
+.swipe-viewer-controls {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* 뷰 모드 드롭다운 */
+.view-mode-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.view-mode-dropdown.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.view-mode-btn {
+    background: #888;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    justify-content: space-between;
+}
+
+.view-mode-btn:hover {
+    background: #666;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.view-mode-arrow {
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.view-mode-dropdown.open .view-mode-arrow {
+    transform: rotate(180deg);
+}
+
+/* 드롭다운 메뉴 */
+.view-mode-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-10px);
+    transition: all 0.2s ease;
+    margin-top: 5px;
+}
+
+.view-mode-dropdown.open .view-mode-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.view-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #333;
+}
+
+.view-mode-option:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.view-mode-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.view-mode-option:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.view-mode-option.active {
+    background-color: #888;
+    color: white;
+}
+
+.view-mode-option i {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 /* 콘텐츠 영역 */
@@ -270,6 +373,12 @@
 .swipe-text-area.translation-text:focus {
     border-color: #888;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 단일 모드 (원문만 보기/번역문만 보기) */
+.swipe-text-area.single-mode {
+    min-height: 500px;
+    height: 100%;
 }
 
 /* 스크롤바 스타일 */
@@ -398,6 +507,34 @@
     
     .swipe-text-area::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    /* 드롭다운 다크테마 */
+    .view-mode-btn {
+        background: #aaa !important;
+        color: #000 !important;
+    }
+    
+    .view-mode-btn:hover {
+        background: #ccc !important;
+    }
+    
+    .view-mode-menu {
+        background: rgba(40, 40, 40, 1) !important;
+        border-color: rgba(80, 80, 80, 0.8) !important;
+    }
+    
+    .view-mode-option {
+        color: #e0e0e0 !important;
+    }
+    
+    .view-mode-option:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .view-mode-option.active {
+        background-color: #aaa !important;
+        color: #000 !important;
     }
 }
 
