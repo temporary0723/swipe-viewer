@@ -618,8 +618,8 @@ function applyChatFontStyles() {
             element.style.setProperty('font-family', userChatFontFamily, 'important');
             element.style.setProperty('font-size', userChatFontSize, 'important');
             
-            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 포함)
-            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td, code, pre');
+            // 마크다운 요소들에도 사용자 폰트 적용 (모든 텍스트 요소 포함)
+            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, q, u, blockquote, ul, ol, li, a, table, th, td, code, pre');
             markdownElements.forEach(mdElement => {
                 // 모든 요소에 사용자 채팅 폰트 적용
                 mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
