@@ -425,7 +425,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <div class="swipe-text-content single-text">${renderedOriginal}</div>
+                <div class="swipe-text-content mes_text single-text">${renderedOriginal}</div>
             </div>
         `;
     }
@@ -442,7 +442,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
-                    <div class="swipe-text-content original-text single-mode">${renderedOriginal}</div>
+                    <div class="swipe-text-content mes_text original-text single-mode">${renderedOriginal}</div>
                 </div>
             `;
         case 'translation':
@@ -468,7 +468,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
-                    <div class="swipe-text-content translation-text single-mode">${renderedTranslation}</div>
+                    <div class="swipe-text-content mes_text translation-text single-mode">${renderedTranslation}</div>
                 </div>
             `;
         case 'both':
@@ -483,7 +483,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
-                        <div class="swipe-text-content original-text">${renderedOriginal}</div>
+                        <div class="swipe-text-content mes_text original-text">${renderedOriginal}</div>
                     </div>
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
@@ -492,7 +492,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
-                        <div class="swipe-text-content translation-text">${renderedTranslation}</div>
+                        <div class="swipe-text-content mes_text translation-text">${renderedTranslation}</div>
                     </div>
                 </div>
             `;
