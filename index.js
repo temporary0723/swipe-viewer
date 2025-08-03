@@ -62,6 +62,28 @@ let markdownConverter = null;
 function initMarkdownConverter() {
     if (!markdownConverter) {
         markdownConverter = reloadMarkdownProcessor();
+        
+        // 마크다운 컨버터 설정 디버깅
+        if (markdownConverter) {
+            console.log('[스와이프 뷰어] 마크다운 컨버터 설정:', {
+                타입: typeof markdownConverter,
+                생성자: markdownConverter.constructor.name,
+                makeHtml: typeof markdownConverter.makeHtml,
+                옵션확인: markdownConverter.getOptions ? markdownConverter.getOptions() : '옵션함수없음'
+            });
+            
+            // 간단한 인용문 테스트
+            try {
+                const testResult = markdownConverter.makeHtml('> 테스트 인용문');
+                console.log('[스와이프 뷰어] 인용문 테스트 결과:', {
+                    입력: '> 테스트 인용문',
+                    출력: testResult,
+                    blockquote포함: testResult.includes('<blockquote>')
+                });
+            } catch (e) {
+                console.log('[스와이프 뷰어] 인용문 테스트 실패:', e);
+            }
+        }
     }
     return markdownConverter;
 }
@@ -76,12 +98,13 @@ function renderMarkdown(text) {
         const converter = initMarkdownConverter();
         const result = converter.makeHtml(text);
         
-        // 인용문 디버깅을 위한 임시 로그
-        if (text.includes('>') && text.includes('인용')) {
-            console.log('[스와이프 뷰어] 인용문 변환 테스트:', {
-                원본: text.substring(0, 100),
-                변환결과: result.substring(0, 200),
-                blockquote포함: result.includes('<blockquote>')
+        // 마크다운 변환 디버깅 (모든 텍스트)
+        if (text.includes('>')) {
+            console.log('[스와이프 뷰어] 마크다운 변환 테스트:', {
+                원본: text.substring(0, 150),
+                변환결과: result.substring(0, 300),
+                blockquote포함: result.includes('<blockquote>'),
+                converter설정: converter ? '로드됨' : '실패'
             });
         }
         

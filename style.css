@@ -427,7 +427,7 @@
 .swipe-text-content strong, 
 .swipe-text-content b {
     font-weight: 600;
-    color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor));
+    color: var(--SmartThemeBodyColor);
 }
 
 .swipe-text-content em, 
@@ -438,7 +438,7 @@
 
 .swipe-text-content code {
     background: var(--black30a);
-    color: var(--SmartThemeQuoteColor);
+    color: var(--SmartThemeBodyColor);
     padding: 2px 4px;
     border-radius: 3px;
     /* JavaScript에서 사용자 폰트가 동적으로 적용됨 */
