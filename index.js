@@ -618,14 +618,12 @@ function applyChatFontStyles() {
             element.style.setProperty('font-family', userChatFontFamily, 'important');
             element.style.setProperty('font-size', userChatFontSize, 'important');
             
-            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 제외)
-            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td');
+            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 포함)
+            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td, code, pre');
             markdownElements.forEach(mdElement => {
-                // code나 pre 태그는 monospace 유지
-                if (!mdElement.closest('code') && !mdElement.closest('pre')) {
-                    mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
-                    mdElement.style.setProperty('font-size', userChatFontSize, 'important');
-                }
+                // 모든 요소에 사용자 채팅 폰트 적용
+                mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
+                mdElement.style.setProperty('font-size', userChatFontSize, 'important');
             });
         });
     }
