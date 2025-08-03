@@ -50,7 +50,6 @@ const messageButtonHtml = `
 let currentPopup = null;
 let currentMessageIndex = -1;
 let currentSwipeIndex = 0;
-let showTranslation = true; // 번역문 표시 토글 상태
 
 /**
  * LLM Translator DB 열기
@@ -203,17 +202,15 @@ async function createSwipeViewerPopup(messageIndex) {
                     <div class="swipe-viewer-content">
                         ${createSwipeContentHTML(swipeData.swipes[currentSwipeIndex] || '', translation, hasTranslation)}
                     </div>
-                    <div class="swipe-viewer-navigation">
-                        <button class="swipe-nav-btn swipe-prev" title="이전 스와이프" ${currentSwipeIndex === 0 ? 'disabled' : ''}>
-                            &lt;
-                        </button>
-                        <div class="swipe-viewer-controls">
-                            ${hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : '<span class="translation-placeholder"></span>'}
-                        </div>
-                        <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
-                            &gt;
-                        </button>
-                    </div>
+                </div>
+                <div class="swipe-viewer-navigation">
+                    <button class="swipe-nav-btn swipe-prev" title="이전 스와이프" ${currentSwipeIndex === 0 ? 'disabled' : ''}>
+                        &lt;
+                    </button>
+                    <div class="swipe-viewer-nav-spacer"></div>
+                    <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
+                        &gt;
+                    </button>
                 </div>
             </div>
         </div>
@@ -233,10 +230,10 @@ async function createSwipeViewerPopup(messageIndex) {
 }
 
 /**
- * 스와이프 콘텐츠 HTML 생성 (번역문 유무 및 토글 상태에 따라 다르게)
+ * 스와이프 콘텐츠 HTML 생성 (번역문 유무에 따라 다르게)
  */
 function createSwipeContentHTML(originalText, translation, hasTranslation) {
-    if (hasTranslation && showTranslation) {
+    if (hasTranslation) {
         return `
             <div class="swipe-text-container dual-view">
                 <div class="swipe-text-section">
@@ -291,11 +288,6 @@ function setupPopupEventHandlers() {
         navigateSwipe(1);
     });
     
-    // 번역문 토글 버튼
-    modal.find('.translation-toggle').on('click', () => {
-        toggleTranslation();
-    });
-    
     // 키보드 네비게이션
     $(document).on('keydown.swipeViewer', (e) => {
         if (e.key === 'ArrowLeft') {
@@ -306,14 +298,6 @@ function setupPopupEventHandlers() {
             closeSwipeViewerPopup();
         }
     });
-}
-
-/**
- * 번역문 토글
- */
-async function toggleTranslation() {
-    showTranslation = !showTranslation;
-    await updateSwipeDisplay();
 }
 
 /**
@@ -351,15 +335,6 @@ async function updateSwipeDisplay() {
     const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
     modal.find('.swipe-viewer-content').html(contentHTML);
     
-    // 네비게이션 영역 업데이트 (컨트롤 버튼 포함)
-    const controlsHTML = hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : '<span class="translation-placeholder"></span>';
-    modal.find('.swipe-viewer-controls').html(controlsHTML);
-    
-    // 번역문 토글 이벤트 다시 바인딩
-    modal.find('.translation-toggle').on('click', () => {
-        toggleTranslation();
-    });
-    
     // 네비게이션 버튼 상태 업데이트
     modal.find('.swipe-prev').prop('disabled', currentSwipeIndex === 0);
     modal.find('.swipe-next').prop('disabled', currentSwipeIndex >= swipeData.swipes.length - 1);
@@ -385,7 +360,6 @@ function closeSwipeViewerPopup() {
     
     currentMessageIndex = -1;
     currentSwipeIndex = 0;
-    showTranslation = true; // 번역문 표시 상태 초기화
 }
 
 /**
