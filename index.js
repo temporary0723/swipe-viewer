@@ -283,6 +283,11 @@ async function createSwipeViewerPopup(messageIndex) {
     // 최초 팝업 생성 시에도 복사 버튼 이벤트 등록
     const originalText = swipeData.swipes[currentSwipeIndex] || '';
     setupCopyButtonEvents(backdrop, originalText, translation);
+    
+    // 폰트 디버깅 로그 출력 (팝업 생성 후)
+    setTimeout(() => {
+        logFontStyles();
+    }, 200);
 }
 
 /**
@@ -586,6 +591,59 @@ async function navigateSwipe(direction) {
 }
 
 /**
+ * 폰트 디버깅 로그 출력
+ */
+function logFontStyles() {
+    try {
+        console.log('[스와이프 뷰어] 폰트 디버깅 시작');
+        
+        // .mes_text 요소의 폰트 스타일 확인
+        const mesTextElements = document.querySelectorAll('.mes_text');
+        if (mesTextElements.length > 0) {
+            const mesTextStyle = window.getComputedStyle(mesTextElements[0]);
+            console.log('[스와이프 뷰어] .mes_text 폰트:', {
+                fontFamily: mesTextStyle.fontFamily,
+                fontSize: mesTextStyle.fontSize,
+                fontWeight: mesTextStyle.fontWeight
+            });
+        }
+        
+        // 스와이프 뷰어 텍스트 콘텐츠의 폰트 스타일 확인
+        const swipeTextElements = document.querySelectorAll('.swipe-text-content');
+        if (swipeTextElements.length > 0) {
+            const swipeTextStyle = window.getComputedStyle(swipeTextElements[0]);
+            console.log('[스와이프 뷰어] .swipe-text-content 폰트:', {
+                fontFamily: swipeTextStyle.fontFamily,
+                fontSize: swipeTextStyle.fontSize,
+                fontWeight: swipeTextStyle.fontWeight
+            });
+        }
+        
+        // body의 폰트 스타일 확인
+        const bodyStyle = window.getComputedStyle(document.body);
+        console.log('[스와이프 뷰어] body 폰트:', {
+            fontFamily: bodyStyle.fontFamily,
+            fontSize: bodyStyle.fontSize
+        });
+        
+        // 실제 메시지 요소 확인
+        const actualMesText = document.querySelector('#chat .mes .mes_text');
+        if (actualMesText) {
+            const actualStyle = window.getComputedStyle(actualMesText);
+            console.log('[스와이프 뷰어] 실제 채팅 메시지 폰트:', {
+                fontFamily: actualStyle.fontFamily,
+                fontSize: actualStyle.fontSize,
+                fontWeight: actualStyle.fontWeight
+            });
+        }
+        
+        console.log('[스와이프 뷰어] 폰트 디버깅 완료');
+    } catch (error) {
+        console.error('[스와이프 뷰어] 폰트 디버깅 중 오류:', error);
+    }
+}
+
+/**
  * 스와이프 디스플레이 업데이트
  */
 async function updateSwipeDisplay() {
@@ -605,6 +663,11 @@ async function updateSwipeDisplay() {
     // 콘텐츠 영역 전체 교체
     const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
     modal.find('.swipe-viewer-content').html(contentHTML);
+    
+    // 폰트 디버깅 로그 출력 (콘텐츠 생성 후)
+    setTimeout(() => {
+        logFontStyles();
+    }, 100);
     
     // 복사 버튼 이벤트 등록 (새로 생성된 버튼들에 대해)
     setupCopyButtonEvents(modal, originalText, translation);
