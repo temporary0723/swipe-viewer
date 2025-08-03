@@ -625,6 +625,47 @@ function applyChatFontStyles() {
                 mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
                 mdElement.style.setProperty('font-size', userChatFontSize, 'important');
             });
+            
+            // 색상 변수 디버깅
+            console.log('[스와이프 뷰어] 색상 변수 디버깅 시작');
+            
+            // CSS 변수들이 정의되어 있는지 확인
+            const rootStyle = window.getComputedStyle(document.documentElement);
+            const testVariables = [
+                '--user-plain-color',
+                '--user-italic-color', 
+                '--user-quote-color',
+                '--user-under-color',
+                '--SmartThemeBodyColor',
+                '--SmartThemeQuoteColor',
+                '--SmartThemeItalicColor',
+                '--SmartThemeUnderlineColor'
+            ];
+            
+            console.log('[스와이프 뷰어] 정의된 CSS 변수들:');
+            testVariables.forEach(varName => {
+                const value = rootStyle.getPropertyValue(varName);
+                console.log(`  ${varName}: "${value}"`);
+            });
+            
+            // 실제 요소들의 색상 확인
+            const testElements = {
+                'em': element.querySelector('em'),
+                'i': element.querySelector('i'), 
+                'q': element.querySelector('q'),
+                'u': element.querySelector('u'),
+                'strong': element.querySelector('strong'),
+                'p': element.querySelector('p'),
+                'a': element.querySelector('a')
+            };
+            
+            console.log('[스와이프 뷰어] 실제 요소들의 적용된 색상:');
+            Object.entries(testElements).forEach(([tagName, elem]) => {
+                if (elem) {
+                    const style = window.getComputedStyle(elem);
+                    console.log(`  ${tagName}: color="${style.color}", font-family="${style.fontFamily}"`);
+                }
+            });
         });
     }
 }
