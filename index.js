@@ -9,6 +9,7 @@ import {
     getRequestHeaders,
     saveSettingsDebounced,
     substituteParams,
+    reloadMarkdownProcessor,
 } from '../../../../script.js';
 
 import {
@@ -51,6 +52,35 @@ let currentPopup = null;
 let currentMessageIndex = -1;
 let currentSwipeIndex = 0;
 let currentViewMode = 'both'; // 'both', 'original', 'translation'
+
+// 마크다운 converter
+let markdownConverter = null;
+
+/**
+ * 마크다운 컨버터 초기화
+ */
+function initMarkdownConverter() {
+    if (!markdownConverter) {
+        markdownConverter = reloadMarkdownProcessor();
+    }
+    return markdownConverter;
+}
+
+/**
+ * 텍스트를 마크다운으로 렌더링
+ */
+function renderMarkdown(text) {
+    if (!text) return '';
+    
+    try {
+        const converter = initMarkdownConverter();
+        return converter.makeHtml(text);
+    } catch (error) {
+        console.warn('[SwipeViewer] 마크다운 렌더링 중 오류:', error);
+        // 마크다운 렌더링에 실패하면 원본 텍스트 반환 (HTML escape 처리)
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    }
+}
 
 /**
  * LLM Translator DB 열기
@@ -364,7 +394,7 @@ function setupCopyButtonEvents(modal, originalText, translation) {
             }
         }
         
-        // 클릭 이벤트 등록
+        // 클릭 이벤트 등록 - 원본 텍스트(마크다운 포함)를 복사
         $button.on('click.swipeviewer', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -378,8 +408,13 @@ function setupCopyButtonEvents(modal, originalText, translation) {
 
 /**
  * 스와이프 콘텐츠 HTML 생성 (번역문 유무 및 뷰 모드에 따라 다르게)
+ * 마크다운을 렌더링해서 표시
  */
 function createSwipeContentHTML(originalText, translation, hasTranslation) {
+    // 마크다운 렌더링
+    const renderedOriginal = renderMarkdown(originalText);
+    const renderedTranslation = translation ? renderMarkdown(translation) : '';
+    
     // 번역문이 없으면 원문만 표시
     if (!hasTranslation) {
         return `
@@ -389,7 +424,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <textarea readonly class="swipe-text-area single-text">${originalText}</textarea>
+                <div class="swipe-text-content single-text">${renderedOriginal}</div>
             </div>
         `;
     }
@@ -406,7 +441,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
-                    <textarea readonly class="swipe-text-area original-text single-mode">${originalText}</textarea>
+                    <div class="swipe-text-content original-text single-mode">${renderedOriginal}</div>
                 </div>
             `;
         case 'translation':
@@ -432,7 +467,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
-                    <textarea readonly class="swipe-text-area translation-text single-mode">${translation}</textarea>
+                    <div class="swipe-text-content translation-text single-mode">${renderedTranslation}</div>
                 </div>
             `;
         case 'both':
@@ -447,7 +482,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
-                        <textarea readonly class="swipe-text-area original-text">${originalText}</textarea>
+                        <div class="swipe-text-content original-text">${renderedOriginal}</div>
                     </div>
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
@@ -456,7 +491,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
-                        <textarea readonly class="swipe-text-area translation-text">${translation}</textarea>
+                        <div class="swipe-text-content translation-text">${renderedTranslation}</div>
                     </div>
                 </div>
             `;
@@ -638,6 +673,9 @@ function handleMessageUpdate() {
  */
 function initializeSwipeViewer() {
     console.log(`[${pluginName}] 스와이프 뷰어 확장 초기화 중...`);
+    
+    // 마크다운 컨버터 초기화
+    initMarkdownConverter();
     
     // 기존 메시지에 아이콘 추가
     addSwipeViewerIconsToMessages();
