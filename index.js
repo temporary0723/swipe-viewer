@@ -291,29 +291,22 @@ function parseMarkdown(text) {
 }
 
 /**
- * 텍스트 복사하기 (data 속성에서 가져옴)
+ * 텍스트 복사하기
  */
-async function copyTextFromDataAttribute(button) {
+async function copyToClipboard(text, button) {
     try {
-        // data-text 속성에서 텍스트 가져오기
-        let text = button.getAttribute('data-text');
-        if (!text) {
-            console.error('복사할 텍스트가 없습니다.');
-            return;
-        }
+        // 마크다운 제거하고 순수 텍스트만 복사
+        const plainText = text.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
         
-        // HTML 엔티티 디코딩
-        text = text.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-        
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(plainText);
         
         // 복사 완료 피드백
-        const originalHTML = button.innerHTML;
+        const originalText = button.innerHTML;
         button.innerHTML = '<i class="fa-solid fa-check"></i>';
         button.style.color = '#4CAF50';
         
         setTimeout(() => {
-            button.innerHTML = originalHTML;
+            button.innerHTML = originalText;
             button.style.color = '';
         }, 1500);
         
@@ -321,35 +314,23 @@ async function copyTextFromDataAttribute(button) {
         console.error('클립보드 복사 실패:', err);
         
         // 폴백: 텍스트 선택
-        let text = button.getAttribute('data-text');
-        if (text) {
-            text = text.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-            
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // 복사 완료 피드백
-            const originalHTML = button.innerHTML;
-            button.innerHTML = '<i class="fa-solid fa-check"></i>';
-            button.style.color = '#4CAF50';
-            
-            setTimeout(() => {
-                button.innerHTML = originalHTML;
-                button.style.color = '';
-            }, 1500);
-        }
+        const textArea = document.createElement('textarea');
+        textArea.value = text.replace(/<[^>]*>/g, '');
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        // 복사 완료 피드백
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-check"></i>';
+        button.style.color = '#4CAF50';
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.style.color = '';
+        }, 1500);
     }
-}
-
-/**
- * 안전한 텍스트 인코딩 (HTML 속성용)
- */
-function encodeForDataAttribute(text) {
-    return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
 }
 
 /**
@@ -359,11 +340,10 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
     // 번역문이 없으면 원문만 표시
     if (!hasTranslation) {
         const parsedOriginal = parseMarkdown(originalText);
-        const encodedOriginal = encodeForDataAttribute(originalText);
         return `
             <div class="swipe-text-container single-view">
                 <div class="swipe-text-header">
-                    <button class="copy-btn" data-text="${encodedOriginal}" title="텍스트 복사">
+                    <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="텍스트 복사">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
@@ -376,12 +356,11 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
     switch (currentViewMode) {
         case 'original':
             const parsedOriginalOnly = parseMarkdown(originalText);
-            const encodedOriginalOnly = encodeForDataAttribute(originalText);
             return `
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
                         <label class="swipe-text-label">원문</label>
-                        <button class="copy-btn" data-text="${encodedOriginalOnly}" title="원문 복사">
+                        <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="원문 복사">
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
@@ -402,12 +381,11 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                 `;
             }
             const parsedTranslationOnly = parseMarkdown(translation);
-            const encodedTranslationOnly = encodeForDataAttribute(translation);
             return `
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
                         <label class="swipe-text-label">번역문</label>
-                        <button class="copy-btn" data-text="${encodedTranslationOnly}" title="번역문 복사">
+                        <button class="copy-btn" onclick="copyToClipboard('${translation.replace(/'/g, "\\'")}', this)" title="번역문 복사">
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
@@ -418,14 +396,12 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
         default:
             const parsedOriginalBoth = parseMarkdown(originalText);
             const parsedTranslationBoth = parseMarkdown(translation);
-            const encodedOriginalBoth = encodeForDataAttribute(originalText);
-            const encodedTranslationBoth = encodeForDataAttribute(translation);
             return `
                 <div class="swipe-text-container dual-view">
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
                             <label class="swipe-text-label">원문</label>
-                            <button class="copy-btn" data-text="${encodedOriginalBoth}" title="원문 복사">
+                            <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="원문 복사">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
@@ -434,7 +410,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
                             <label class="swipe-text-label">번역문</label>
-                            <button class="copy-btn" data-text="${encodedTranslationBoth}" title="번역문 복사">
+                            <button class="copy-btn" onclick="copyToClipboard('${translation.replace(/'/g, "\\'")}', this)" title="번역문 복사">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
@@ -503,13 +479,6 @@ function setupPopupEventHandlers() {
         if (!$(e.target).closest('.view-mode-dropdown').length) {
             modal.find('.view-mode-dropdown').removeClass('open');
         }
-    });
-    
-    // 복사 버튼 클릭 이벤트 (이벤트 위임)
-    modal.on('click', '.copy-btn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        copyTextFromDataAttribute(this);
     });
     
     // 키보드 네비게이션
@@ -651,7 +620,8 @@ function initializeSwipeViewer() {
     console.log(`[${pluginName}] 스와이프 뷰어 확장 초기화 완료!`);
 }
 
-// 전역 함수 노출 제거 (이벤트 위임 방식 사용)
+// 전역 함수로 노출 (HTML onclick에서 사용)
+window.copyToClipboard = copyToClipboard;
 
 // jQuery 준비 완료 시 초기화
 jQuery(() => {

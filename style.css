@@ -313,7 +313,6 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    height: 100%;
 }
 
 .swipe-text-section:first-child {
@@ -457,11 +456,9 @@
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     flex: 1;
     min-height: 300px;
-    max-height: 100%;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
-    display: block;
 }
 
 .swipe-text-area:focus {
