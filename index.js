@@ -359,28 +359,69 @@ function showCopyFeedback(button, success) {
  * 복사 버튼 이벤트 등록
  */
 function setupCopyButtonEvents(modal, originalText, translation) {
-    console.log('[스와이프 뷰어] 복사 버튼 이벤트 등록 시작');
+    console.log('[스와이프 뷰어] ========== 복사 버튼 이벤트 등록 시작 ==========');
+    console.log('[스와이프 뷰어] 모달 요소:', modal);
+    console.log('[스와이프 뷰어] 모달 존재 여부:', modal.length > 0);
     
-    // 모든 복사 버튼 찾기
-    const copyButtons = modal.find('.copy-btn');
-    console.log('[스와이프 뷰어] 찾은 복사 버튼 수:', copyButtons.length);
+    // HTML 구조 확인
+    const contentArea = modal.find('.swipe-viewer-content');
+    console.log('[스와이프 뷰어] 콘텐츠 영역:', contentArea);
+    console.log('[스와이프 뷰어] 콘텐츠 HTML:', contentArea.html());
+    
+    // 모든 복사 버튼 찾기 (다양한 방법으로 시도)
+    const copyButtons1 = modal.find('.copy-btn');
+    const copyButtons2 = modal.find('button.copy-btn');
+    const copyButtons3 = $('.copy-btn'); // 전역 검색
+    const copyButtons4 = $('button[title*="복사"]'); // title 속성으로 검색
+    
+    console.log('[스와이프 뷰어] 방법1 - .copy-btn 버튼 수:', copyButtons1.length);
+    console.log('[스와이프 뷰어] 방법2 - button.copy-btn 버튼 수:', copyButtons2.length);
+    console.log('[스와이프 뷰어] 방법3 - 전역 .copy-btn 버튼 수:', copyButtons3.length);
+    console.log('[스와이프 뷰어] 방법4 - title로 찾은 버튼 수:', copyButtons4.length);
+    
+    // 실제 사용할 버튼들
+    const copyButtons = copyButtons1;
+    
+    if (copyButtons.length === 0) {
+        console.error('[스와이프 뷰어] ❌ 복사 버튼을 찾을 수 없습니다!');
+        
+        // DOM이 완전히 로드되지 않았을 수 있으므로 잠시 후 재시도
+        setTimeout(() => {
+            console.log('[스와이프 뷰어] 0.1초 후 재시도...');
+            setupCopyButtonEvents(modal, originalText, translation);
+        }, 100);
+        return;
+    }
+    
+    console.log('[스와이프 뷰어] ✅ 복사 버튼', copyButtons.length, '개 발견!');
     
     copyButtons.each(function(index, button) {
         const $button = $(button);
         
+        console.log('[스와이프 뷰어] 버튼', index + 1, '처리 중...');
+        console.log('[스와이프 뷰어] 버튼 요소:', button);
+        console.log('[스와이프 뷰어] 버튼 HTML:', $button[0].outerHTML);
+        
         // 기존 이벤트 제거
         $button.off('click.swipeviewer');
+        console.log('[스와이프 뷰어] 기존 이벤트 제거 완료');
         
         // 버튼이 속한 영역에 따라 텍스트 결정
         let textToCopy = '';
-        if ($button.closest('.swipe-text-container.single-view').length > 0) {
+        const parentContainer = $button.closest('.swipe-text-container');
+        const parentSection = $button.closest('.swipe-text-section');
+        const headerLabel = $button.closest('.swipe-text-header').find('.swipe-text-label');
+        
+        console.log('[스와이프 뷰어] 부모 컨테이너:', parentContainer.attr('class'));
+        console.log('[스와이프 뷰어] 부모 섹션:', parentSection.attr('class'));
+        console.log('[스와이프 뷰어] 헤더 라벨 텍스트:', headerLabel.text());
+        
+        if (parentContainer.hasClass('single-view')) {
             // 단일 뷰의 경우
-            if ($button.closest('.original-text').length > 0 || 
-                $button.closest('.swipe-text-header').find('.swipe-text-label').text().includes('원문')) {
+            if (headerLabel.text().includes('원문')) {
                 textToCopy = originalText;
                 console.log('[스와이프 뷰어] 버튼', index + 1, ': 원문 복사 버튼으로 설정');
-            } else if ($button.closest('.translation-text').length > 0 || 
-                       $button.closest('.swipe-text-header').find('.swipe-text-label').text().includes('번역문')) {
+            } else if (headerLabel.text().includes('번역문')) {
                 textToCopy = translation;
                 console.log('[스와이프 뷰어] 버튼', index + 1, ': 번역문 복사 버튼으로 설정');
             } else {
@@ -388,9 +429,9 @@ function setupCopyButtonEvents(modal, originalText, translation) {
                 textToCopy = originalText;
                 console.log('[스와이프 뷰어] 버튼', index + 1, ': 기본(원문) 복사 버튼으로 설정');
             }
-        } else {
+        } else if (parentContainer.hasClass('dual-view')) {
             // 이중 뷰의 경우
-            if ($button.closest('.swipe-text-section').find('.swipe-text-label').text().includes('원문')) {
+            if (headerLabel.text().includes('원문')) {
                 textToCopy = originalText;
                 console.log('[스와이프 뷰어] 버튼', index + 1, ': 원문 복사 버튼으로 설정');
             } else {
@@ -399,12 +440,15 @@ function setupCopyButtonEvents(modal, originalText, translation) {
             }
         }
         
+        console.log('[스와이프 뷰어] 복사할 텍스트 길이:', textToCopy?.length);
+        
         // 클릭 이벤트 등록
-        $button.on('click.swipeviewer', function(e) {
+        const clickHandler = function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            console.log('[스와이프 뷰어] 복사 버튼 클릭됨 - 버튼', index + 1);
+            console.log('[스와이프 뷰어] 🎯 복사 버튼 클릭됨! - 버튼', index + 1);
+            console.log('[스와이프 뷰어] 클릭된 버튼:', this);
             console.log('[스와이프 뷰어] 복사할 텍스트 길이:', textToCopy?.length);
             
             if (textToCopy) {
@@ -412,10 +456,20 @@ function setupCopyButtonEvents(modal, originalText, translation) {
             } else {
                 console.error('[스와이프 뷰어] 복사할 텍스트가 없습니다');
             }
+        };
+        
+        $button.on('click.swipeviewer', clickHandler);
+        
+        // 추가 확인: 네이티브 이벤트도 등록
+        button.addEventListener('click', function(e) {
+            console.log('[스와이프 뷰어] 🎯 네이티브 클릭 이벤트 발생!');
+            clickHandler.call(this, e);
         });
+        
+        console.log('[스와이프 뷰어] 버튼', index + 1, '이벤트 등록 완료');
     });
     
-    console.log('[스와이프 뷰어] 복사 버튼 이벤트 등록 완료');
+    console.log('[스와이프 뷰어] ========== 복사 버튼 이벤트 등록 완료 ==========');
 }
 
 /**
@@ -618,6 +672,19 @@ async function updateSwipeDisplay() {
     // 콘텐츠 영역 전체 교체
     const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
     modal.find('.swipe-viewer-content').html(contentHTML);
+    
+    // 임시 테스트 버튼 추가
+    const testButtonHTML = '<button id="test-copy-btn" style="position: fixed; top: 10px; right: 10px; z-index: 99999; background: red; color: white; padding: 10px;">TEST COPY</button>';
+    $('body').append(testButtonHTML);
+    
+    $('#test-copy-btn').on('click', function() {
+        console.log('[스와이프 뷰어] 🧪 테스트 버튼 클릭됨!');
+        copyToClipboard('테스트 텍스트', this);
+        // 3초 후 자동 제거
+        setTimeout(() => {
+            $('#test-copy-btn').remove();
+        }, 3000);
+    });
     
     // 복사 버튼 이벤트 등록 (새로 생성된 버튼들에 대해)
     setupCopyButtonEvents(modal, originalText, translation);
