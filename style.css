@@ -337,7 +337,6 @@
 .swipe-text-area {
     width: 100%;
     height: 100%;
-    resize: none;
     border: 1px solid var(--SmartThemeBorderColor);
     border-radius: 8px;
     padding: 15px;
@@ -352,11 +351,82 @@
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     flex: 1;
     min-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .swipe-text-area:focus {
     border-color: var(--SmartThemeQuoteColor);
     box-shadow: inset 0 1px 3px var(--black30a), 0 0 0 3px var(--black30a);
+}
+
+/* 마크다운 스타일 */
+.swipe-text-area h1,
+.swipe-text-area h2,
+.swipe-text-area h3 {
+    margin: 16px 0 8px 0;
+    color: var(--SmartThemeBodyColor);
+    font-weight: 600;
+}
+
+.swipe-text-area h1 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--SmartThemeBorderColor);
+    padding-bottom: 4px;
+}
+
+.swipe-text-area h2 {
+    font-size: 1.3em;
+}
+
+.swipe-text-area h3 {
+    font-size: 1.1em;
+}
+
+.swipe-text-area strong {
+    font-weight: 600;
+    color: var(--SmartThemeBodyColor);
+}
+
+.swipe-text-area em {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.swipe-text-area code {
+    background: var(--SmartThemeBorderColor);
+    color: var(--SmartThemeBodyColor);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', 'Monaco', monospace;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.swipe-text-area blockquote {
+    border-left: 4px solid var(--SmartThemeQuoteColor);
+    margin: 8px 0;
+    padding: 8px 0 8px 16px;
+    background: var(--black30a);
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.swipe-text-area ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.swipe-text-area li {
+    margin: 4px 0;
+    list-style-type: disc;
+}
+
+.swipe-text-area del {
+    text-decoration: line-through;
+    opacity: 0.6;
 }
 
 /* 단일 뷰 (번역문 없을 때) */
