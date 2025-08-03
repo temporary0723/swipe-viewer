@@ -632,9 +632,9 @@ function applyChatFontStyles() {
         testContainer.appendChild(testChild);
         
         // 채팅 영역에 추가 (사용자 CSS가 적용되는 위치)
-        const chatContainer = document.querySelector('#chat');
-        if (chatContainer) {
-            chatContainer.appendChild(testContainer);
+        const chatContainerForTest = document.querySelector('#chat');
+        if (chatContainerForTest) {
+            chatContainerForTest.appendChild(testContainer);
             
             const testChildStyle = window.getComputedStyle(testChild);
             console.log('[스와이프 뷰어] 채팅 영역 내 .mes_text * 스타일:', {
@@ -642,7 +642,7 @@ function applyChatFontStyles() {
                 fontSize: testChildStyle.fontSize
             });
             
-            chatContainer.removeChild(testContainer);
+            chatContainerForTest.removeChild(testContainer);
         }
         
         // ChosunSg 폰트가 사용 가능한지 확인
@@ -685,9 +685,9 @@ function applyChatFontStyles() {
         tempChild.textContent = 'test';
         tempMesText.appendChild(tempChild);
         
-        const chatContainer = document.querySelector('#chat');
-        if (chatContainer) {
-            chatContainer.appendChild(tempMesText);
+        const chatContainerForDetection = document.querySelector('#chat');
+        if (chatContainerForDetection) {
+            chatContainerForDetection.appendChild(tempMesText);
             const tempChildStyle = window.getComputedStyle(tempChild);
             
             // 실제 사용자 CSS가 적용된 폰트 감지
@@ -700,7 +700,7 @@ function applyChatFontStyles() {
                 });
             }
             
-            chatContainer.removeChild(tempMesText);
+            chatContainerForDetection.removeChild(tempMesText);
         }
         
         // 스와이프 뷰어 텍스트 콘텐츠에 사용자 채팅 폰트 강제 적용
