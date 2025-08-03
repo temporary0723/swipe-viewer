@@ -589,146 +589,36 @@ async function navigateSwipe(direction) {
 
 
 /**
- * 실제 채팅 메시지 폰트 스타일 적용
+ * 사용자 채팅 폰트 동적 감지 및 적용
  */
 function applyChatFontStyles() {
-    console.log('[스와이프 뷰어] 폰트 스타일 적용 시작');
+    // 사용자 채팅 폰트 설정 동적 감지
+    const tempMesText = document.createElement('div');
+    tempMesText.className = 'mes_text';
+    const tempChild = document.createElement('span');
+    tempChild.textContent = 'test';
+    tempMesText.appendChild(tempChild);
     
-    // 실제 채팅 메시지에서 폰트 스타일 가져오기
-    const actualMesText = document.querySelector('#chat .mes .mes_text');
-    if (actualMesText) {
-        const computedStyle = window.getComputedStyle(actualMesText);
-        const fontFamily = computedStyle.fontFamily;
-        const fontSize = computedStyle.fontSize;
-        const fontWeight = computedStyle.fontWeight;
-        const lineHeight = computedStyle.lineHeight;
+    const chatContainer = document.querySelector('#chat');
+    if (chatContainer) {
+        // 채팅 영역에 임시 요소 추가하여 실제 사용자 CSS 규칙 확인
+        chatContainer.appendChild(tempMesText);
+        const tempChildStyle = window.getComputedStyle(tempChild);
         
-        console.log('[스와이프 뷰어] 실제 채팅 메시지 폰트:', {
-            fontFamily, fontSize, fontWeight, lineHeight
-        });
+        const userChatFontFamily = tempChildStyle.fontFamily;
+        const userChatFontSize = tempChildStyle.fontSize;
         
-        // 사용자가 설정한 채팅 폰트가 실제로 적용되는지 확인
-        console.log('[스와이프 뷰어] CSS 규칙 확인...');
+        chatContainer.removeChild(tempMesText);
         
-        // .mes_text 하위 요소에서 실제 폰트 확인
-        const mesTextChild = actualMesText.querySelector('*');
-        if (mesTextChild) {
-            const childStyle = window.getComputedStyle(mesTextChild);
-            console.log('[스와이프 뷰어] .mes_text 하위 요소 폰트:', {
-                fontFamily: childStyle.fontFamily,
-                fontSize: childStyle.fontSize,
-                element: mesTextChild.tagName
-            });
-        }
-        
-        // CSS 규칙을 강제로 적용해보기
-        console.log('[스와이프 뷰어] 사용자 CSS 강제 적용 테스트...');
-        
-        // 테스트용 .mes_text 구조 생성
-        const testContainer = document.createElement('div');
-        testContainer.className = 'mes_text';
-        const testChild = document.createElement('div');
-        testChild.textContent = '테스트 텍스트';
-        testContainer.appendChild(testChild);
-        
-        // 채팅 영역에 추가 (사용자 CSS가 적용되는 위치)
-        const chatContainerForTest = document.querySelector('#chat');
-        if (chatContainerForTest) {
-            chatContainerForTest.appendChild(testContainer);
-            
-            const testChildStyle = window.getComputedStyle(testChild);
-            console.log('[스와이프 뷰어] 채팅 영역 내 .mes_text * 스타일:', {
-                fontFamily: testChildStyle.fontFamily,
-                fontSize: testChildStyle.fontSize
-            });
-            
-            chatContainerForTest.removeChild(testContainer);
-        }
-        
-        // ChosunSg 폰트가 사용 가능한지 확인
-        const testElement = document.createElement('div');
-        testElement.style.fontFamily = 'ChosunSg, LeeSeoyun, sans-serif';
-        testElement.style.fontSize = '14.35px';
-        document.body.appendChild(testElement);
-        const testStyle = window.getComputedStyle(testElement);
-        console.log('[스와이프 뷰어] ChosunSg 폰트 fallback 테스트:', {
-            fontFamily: testStyle.fontFamily,
-            fontSize: testStyle.fontSize
-        });
-        document.body.removeChild(testElement);
-        
-        // 전역 폰트와 비교 (body 폰트)
-        const bodyStyle = window.getComputedStyle(document.body);
-        console.log('[스와이프 뷰어] Body 폰트:', {
-            fontFamily: bodyStyle.fontFamily,
-            fontSize: bodyStyle.fontSize
-        });
-        
-        // 모달의 현재 폰트 확인
-        const modal = document.querySelector('.swipe-viewer-modal');
-        if (modal) {
-            const modalStyle = window.getComputedStyle(modal);
-            console.log('[스와이프 뷰어] 모달 폰트:', {
-                fontFamily: modalStyle.fontFamily,
-                fontSize: modalStyle.fontSize
-            });
-        }
-        
-        // 사용자 채팅 폰트 설정 동적 감지
-        let userChatFontFamily = 'ChosunSg';  // 기본값
-        let userChatFontSize = '14.35px';     // 기본값
-        
-        // 채팅 영역에서 실제 .mes_text * 규칙 테스트
-        const tempMesText = document.createElement('div');
-        tempMesText.className = 'mes_text';
-        const tempChild = document.createElement('span');
-        tempChild.textContent = 'test';
-        tempMesText.appendChild(tempChild);
-        
-        const chatContainerForDetection = document.querySelector('#chat');
-        if (chatContainerForDetection) {
-            chatContainerForDetection.appendChild(tempMesText);
-            const tempChildStyle = window.getComputedStyle(tempChild);
-            
-            // 실제 사용자 CSS가 적용된 폰트 감지
-            if (tempChildStyle.fontFamily !== bodyStyle.fontFamily) {
-                userChatFontFamily = tempChildStyle.fontFamily;
-                userChatFontSize = tempChildStyle.fontSize;
-                console.log('[스와이프 뷰어] 동적 감지된 사용자 채팅 폰트:', {
-                    fontFamily: userChatFontFamily,
-                    fontSize: userChatFontSize
-                });
-            }
-            
-            chatContainerForDetection.removeChild(tempMesText);
-        }
-        
-        // 스와이프 뷰어 텍스트 콘텐츠에 사용자 채팅 폰트 강제 적용
+        // 스와이프 뷰어 텍스트 콘텐츠에 사용자 채팅 폰트 적용
         const swipeTextElements = document.querySelectorAll('.swipe-text-content.mes_text');
-        console.log('[스와이프 뷰어] 스와이프 텍스트 요소 개수:', swipeTextElements.length);
         
-        swipeTextElements.forEach((element, index) => {
-            console.log(`[스와이프 뷰어] 요소 ${index} 폰트 적용 전:`, {
-                fontFamily: window.getComputedStyle(element).fontFamily,
-                fontSize: window.getComputedStyle(element).fontSize
-            });
-            
-            // 1차: 실제 채팅에서 감지된 폰트 적용
-            element.style.fontFamily = fontFamily;
-            element.style.fontSize = fontSize;
-            element.style.fontWeight = fontWeight;
-            element.style.lineHeight = lineHeight;
-            
-            // 2차: 사용자 CSS 강제 적용 (우선순위 높임)
+        swipeTextElements.forEach(element => {
+            // 사용자 채팅 폰트 강제 적용
             element.style.setProperty('font-family', userChatFontFamily, 'important');
             element.style.setProperty('font-size', userChatFontSize, 'important');
             
-            console.log(`[스와이프 뷰어] 요소 ${index} 사용자 폰트 강제 적용 후:`, {
-                fontFamily: window.getComputedStyle(element).fontFamily,
-                fontSize: window.getComputedStyle(element).fontSize
-            });
-            
-            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre code 제외)
+            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 제외)
             const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td');
             markdownElements.forEach(mdElement => {
                 // code나 pre 태그는 monospace 유지
@@ -738,8 +628,6 @@ function applyChatFontStyles() {
                 }
             });
         });
-    } else {
-        console.log('[스와이프 뷰어] 실제 채팅 메시지 요소를 찾을 수 없습니다');
     }
 }
 

@@ -395,69 +395,48 @@
     line-height: 1.6;
 }
 
-/* 스와이프 뷰어 텍스트가 채팅 메시지와 동일한 폰트 사용 */
-.swipe-text-content.mes_text {
-    /* JavaScript에서 실제 채팅 메시지 폰트를 동적으로 적용 */
-    /* CSS는 기본값만 설정하고 JS에서 overwrite */
-}
-
-/* 스와이프 뷰어 내부의 모든 요소가 부모의 폰트 상속 */
-.swipe-text-content.mes_text * {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-}
-
-/* 마크다운 렌더링 요소 스타일 (JavaScript에서 설정된 폰트 상속) */
-.swipe-text-content.mes_text h1,
-.swipe-text-content.mes_text h2,
-.swipe-text-content.mes_text h3,
-.swipe-text-content.mes_text h4,
-.swipe-text-content.mes_text h5,
-.swipe-text-content.mes_text h6 {
+/* 마크다운 렌더링 요소 스타일 (JavaScript에서 폰트가 동적으로 적용됨) */
+.swipe-text-content h1,
+.swipe-text-content h2,
+.swipe-text-content h3,
+.swipe-text-content h4,
+.swipe-text-content h5,
+.swipe-text-content h6 {
     color: var(--SmartThemeBodyColor);
     margin: 1em 0 0.5em 0;
     font-weight: 600;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text h1:first-child,
-.swipe-text-content.mes_text h2:first-child,
-.swipe-text-content.mes_text h3:first-child,
-.swipe-text-content.mes_text h4:first-child,
-.swipe-text-content.mes_text h5:first-child,
-.swipe-text-content.mes_text h6:first-child {
+.swipe-text-content h1:first-child,
+.swipe-text-content h2:first-child,
+.swipe-text-content h3:first-child,
+.swipe-text-content h4:first-child,
+.swipe-text-content h5:first-child,
+.swipe-text-content h6:first-child {
     margin-top: 0;
 }
 
-.swipe-text-content.mes_text p {
+.swipe-text-content p {
     margin: 0 0 1em 0;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text p:last-child {
+.swipe-text-content p:last-child {
     margin-bottom: 0;
 }
 
-.swipe-text-content.mes_text strong, 
-.swipe-text-content.mes_text b {
+.swipe-text-content strong, 
+.swipe-text-content b {
     font-weight: 600;
     color: var(--SmartThemeBodyColor);
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text em, 
-.swipe-text-content.mes_text i {
+.swipe-text-content em, 
+.swipe-text-content i {
     font-style: italic;
     color: var(--SmartThemeBodyColor);
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text code {
+.swipe-text-content code {
     background: var(--black30a);
     color: var(--SmartThemeQuoteColor);
     padding: 2px 4px;
@@ -466,7 +445,7 @@
     font-size: 0.9em;
 }
 
-.swipe-text-content.mes_text pre {
+.swipe-text-content pre {
     background: var(--black30a);
     color: var(--SmartThemeBodyColor);
     padding: 12px;
@@ -474,70 +453,57 @@
     overflow-x: auto;
     margin: 1em 0;
     border: 1px solid var(--SmartThemeBorderColor);
-    font-family: inherit;
 }
 
-.swipe-text-content.mes_text pre code {
+.swipe-text-content pre code {
     background: none;
     padding: 0;
     color: inherit;
     font-family: monospace;
 }
 
-.swipe-text-content.mes_text blockquote {
+.swipe-text-content blockquote {
     border-left: 4px solid var(--SmartThemeQuoteColor);
     padding-left: 12px;
     margin: 1em 0;
     color: var(--SmartThemeBodyColor);
     opacity: 0.9;
     font-style: italic;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text ul,
-.swipe-text-content.mes_text ol {
+.swipe-text-content ul,
+.swipe-text-content ol {
     margin: 1em 0;
     padding-left: 2em;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text li {
+.swipe-text-content li {
     margin: 0.5em 0;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text a {
+.swipe-text-content a {
     color: var(--SmartThemeQuoteColor);
     text-decoration: underline;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text a:hover {
+.swipe-text-content a:hover {
     opacity: 0.8;
 }
 
-.swipe-text-content.mes_text table {
+.swipe-text-content table {
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text th,
-.swipe-text-content.mes_text td {
+.swipe-text-content th,
+.swipe-text-content td {
     border: 1px solid var(--SmartThemeBorderColor);
     padding: 8px 12px;
     text-align: left;
-    font-family: inherit;
-    font-size: inherit;
 }
 
-.swipe-text-content.mes_text th {
+.swipe-text-content th {
     background: var(--black30a);
     font-weight: 600;
 }
