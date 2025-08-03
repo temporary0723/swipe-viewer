@@ -268,29 +268,41 @@ function getViewModeText(mode) {
 }
 
 /**
- * 텍스트를 클립보드에 복사 (가벼운 방법)
+ * 텍스트 복사하기 (LALib 방식 참고)
  */
-async function copyToClipboard(text, button) {
+function copyToClipboard(text, button) {
     if (!text || !button) return;
     
     try {
-        await navigator.clipboard.writeText(text.toString());
-        showCopyFeedback(button, true);
+        navigator.clipboard.writeText(text.toString()).then(() => {
+            showCopyFeedback(button, true);
+        }).catch(err => {
+            fallbackCopy(text, button);
+        });
     } catch (err) {
-        // 가벼운 폴백: 간단한 방법 시도
-        try {
-            const tempInput = document.createElement('input');
-            tempInput.value = text.toString();
-            tempInput.style.position = 'absolute';
-            tempInput.style.left = '-9999px';
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            const success = document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            showCopyFeedback(button, success);
-        } catch (fallbackErr) {
-            showCopyFeedback(button, false);
-        }
+        fallbackCopy(text, button);
+    }
+}
+
+/**
+ * 폴백 복사 방법 (LALib 방식)
+ */
+function fallbackCopy(text, button) {
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = text.toString();
+        ta.style.position = 'fixed';
+        ta.style.inset = '0';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopyFeedback(button, successful);
+    } catch (err) {
+        showCopyFeedback(button, false);
     }
 }
 
@@ -353,12 +365,12 @@ function setupCopyButtonEvents(modal, originalText, translation) {
         }
         
         // 클릭 이벤트 등록
-        $button.on('click.swipeviewer', async function(e) {
+        $button.on('click.swipeviewer', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
             if (textToCopy) {
-                await copyToClipboard(textToCopy, button);
+                copyToClipboard(textToCopy, button);
             }
         });
     });
