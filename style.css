@@ -448,17 +448,17 @@
     background: rgba(0, 0, 0, 0.3);
 }
 
-/* 반응형 디자인 */
+/* 태블릿 반응형 디자인 */
 @media (max-width: 950px) {
     .swipe-viewer-backdrop {
         align-items: flex-start;
-        padding-top: 5vh;
-        padding-bottom: 5vh;
+        padding-top: 3vh;
+        padding-bottom: 3vh;
     }
     
     .swipe-viewer-modal {
         width: 95vw;
-        height: 90vh;
+        height: 94vh;
         max-width: none;
         transform: scale(0.98);
         position: relative;
@@ -470,12 +470,12 @@
     }
     
     .swipe-viewer-navigation {
-        gap: 10px;
-        padding: 12px 15px;
+        gap: 8px;
+        padding: 10px 12px;
     }
     
     .swipe-viewer-content {
-        padding: 15px;
+        padding: 12px;
     }
     
     .swipe-nav-btn {
@@ -485,7 +485,128 @@
     }
     
     .swipe-viewer-header {
-        padding: 8px 15px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .view-mode-btn {
+        min-width: 120px;
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .swipe-text-container.dual-view .swipe-text-section {
+        min-height: 150px;
+    }
+    
+    .swipe-text-area {
+        min-height: 200px;
+        font-size: 14px;
+        padding: 12px;
+    }
+}
+
+/* 스마트폰 반응형 디자인 */
+@media (max-width: 480px) {
+    .swipe-viewer-backdrop {
+        padding-top: 2vh;
+        padding-bottom: 2vh;
+    }
+    
+    .swipe-viewer-modal {
+        width: 98vw;
+        height: 96vh;
+        border-radius: 8px;
+    }
+    
+    .swipe-viewer-header {
+        padding: 6px 10px !important;
+        flex-wrap: wrap;
+    }
+    
+    .swipe-viewer-header h3 {
+        font-size: 14px;
+    }
+    
+    .swipe-viewer-close {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+    
+    .swipe-viewer-content {
+        padding: 8px;
+    }
+    
+    .swipe-viewer-navigation {
+        gap: 6px;
+        padding: 8px 10px;
+        flex-wrap: wrap;
+    }
+    
+    .swipe-nav-btn {
+        min-width: 35px;
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+    
+    .view-mode-btn {
+        min-width: 100px;
+        padding: 6px 10px;
+        font-size: 12px;
+        order: 3;
+        flex-basis: 100%;
+        margin-top: 8px;
+    }
+    
+    /* 스마트폰에서 드롭다운 메뉴 위치 조정 */
+    .view-mode-menu {
+        min-width: 180px;
+        max-width: 90vw;
+    }
+    
+    /* 텍스트 영역 최적화 */
+    .swipe-text-container.dual-view .swipe-text-section {
+        min-height: 120px;
+    }
+    
+    .swipe-text-area {
+        min-height: 150px;
+        font-size: 13px;
+        padding: 10px;
+        line-height: 1.5;
+    }
+    
+    .swipe-text-container.single-view .swipe-text-area {
+        min-height: 250px;
+    }
+    
+    .swipe-text-area.single-mode {
+        min-height: 300px;
+    }
+    
+    .swipe-text-label {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+    
+    /* 번역문 없음 안내 최적화 */
+    .no-translation-notice {
+        padding: 20px 15px;
+        min-height: 200px;
+    }
+    
+    .no-translation-notice i {
+        font-size: 36px;
+        margin-bottom: 15px;
+    }
+    
+    .no-translation-notice h4 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .no-translation-notice p {
+        font-size: 13px;
     }
 }
 
