@@ -434,18 +434,18 @@
 .swipe-text-content em, 
 .swipe-text-content i {
     font-style: italic;
-    color: var(--user-italic-color, var(--SmartThemeItalicColor, var(--SmartThemeBodyColor)));
+    color: var(--user-italic-color, var(--SmartThemeQuoteColor));
 }
 
 .swipe-text-content q {
-    color: var(--user-quote-color, var(--SmartThemeQuoteColor, var(--SmartThemeBodyColor)));
+    color: var(--user-quote-color, var(--SmartThemeQuoteColor));
     font-style: italic;
 }
 
 .swipe-text-content u {
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor, var(--SmartThemeBodyColor)));
+    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
     text-decoration: underline;
-    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor)));
+    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor));
 }
 
 .swipe-text-content code {
@@ -478,7 +478,7 @@
     border-left: 4px solid var(--user-quote-color, var(--SmartThemeQuoteColor));
     padding-left: 12px;
     margin: 1em 0;
-    color: var(--user-quote-color, var(--SmartThemeQuoteColor, var(--SmartThemeBodyColor)));
+    color: var(--user-quote-color, var(--SmartThemeQuoteColor));
     opacity: 0.9;
     font-style: italic;
 }
@@ -496,14 +496,14 @@
 }
 
 .swipe-text-content a {
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor)));
+    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
     text-decoration: underline;
-    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor)));
+    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor));
 }
 
 .swipe-text-content a:hover {
     opacity: 0.8;
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor)));
+    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
 }
 
 .swipe-text-content table {
