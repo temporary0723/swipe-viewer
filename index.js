@@ -102,36 +102,47 @@ function createSwipeViewerPopup(messageIndex) {
     currentMessageIndex = messageIndex;
     currentSwipeIndex = swipeData.currentSwipeId;
     
-    const popupHtml = `
-        <div id="${MODAL_ID}" class="swipe-viewer-modal">
-            <div class="swipe-viewer-header">
-                <h3>스와이프 뷰어 (${currentSwipeIndex + 1}/${swipeData.swipes.length})</h3>
-                <button class="swipe-viewer-close" title="닫기">×</button>
-            </div>
-            <div class="swipe-viewer-body">
-                <div class="swipe-viewer-navigation">
-                    <button class="swipe-nav-btn swipe-prev" title="이전 스와이프" ${currentSwipeIndex === 0 ? 'disabled' : ''}>
-                        &lt;
-                    </button>
-                    <div class="swipe-viewer-content">
-                        <textarea readonly class="swipe-text-area">${swipeData.swipes[currentSwipeIndex] || ''}</textarea>
+    // 기존 모달이 있으면 제거
+    if (currentPopup) {
+        closeSwipeViewerPopup();
+    }
+    
+    // 백드롭 생성
+    const backdrop = $(`
+        <div id="${MODAL_ID}" class="swipe-viewer-backdrop">
+            <div class="swipe-viewer-modal">
+                <div class="swipe-viewer-header">
+                    <h3>스와이프 뷰어 (${currentSwipeIndex + 1}/${swipeData.swipes.length})</h3>
+                    <button class="swipe-viewer-close" title="닫기">×</button>
+                </div>
+                <div class="swipe-viewer-body">
+                    <div class="swipe-viewer-navigation">
+                        <button class="swipe-nav-btn swipe-prev" title="이전 스와이프" ${currentSwipeIndex === 0 ? 'disabled' : ''}>
+                            &lt;
+                        </button>
+                        <div class="swipe-viewer-content">
+                            <textarea readonly class="swipe-text-area">${swipeData.swipes[currentSwipeIndex] || ''}</textarea>
+                        </div>
+                        <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
+                            &gt;
+                        </button>
                     </div>
-                    <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
-                        &gt;
-                    </button>
                 </div>
             </div>
         </div>
-    `;
+    `);
     
-    currentPopup = new Popup(popupHtml, POPUP_TYPE.TEXT, null, { 
-        allowHorizontalScrolling: false,
-        allowVerticalScrolling: false 
-    });
+    // DOM에 추가
+    $('body').append(backdrop);
     
-    currentPopup.show().then(() => {
-        setupPopupEventHandlers();
-    });
+    // 애니메이션을 위한 클래스 추가
+    setTimeout(() => {
+        backdrop.addClass('visible');
+        backdrop.find('.swipe-viewer-modal').addClass('visible');
+    }, 10);
+    
+    currentPopup = backdrop;
+    setupPopupEventHandlers();
 }
 
 /**
@@ -139,6 +150,18 @@ function createSwipeViewerPopup(messageIndex) {
  */
 function setupPopupEventHandlers() {
     const modal = $(`#${MODAL_ID}`);
+    
+    // 백드롭 클릭으로 닫기
+    modal.on('click', (e) => {
+        if (e.target === modal[0]) {
+            closeSwipeViewerPopup();
+        }
+    });
+    
+    // 모달 내부 클릭 시 이벤트 전파 방지
+    modal.find('.swipe-viewer-modal').on('click', (e) => {
+        e.stopPropagation();
+    });
     
     // 닫기 버튼
     modal.find('.swipe-viewer-close').on('click', () => {
@@ -191,7 +214,7 @@ function updateSwipeDisplay() {
     const modal = $(`#${MODAL_ID}`);
     
     // 헤더 업데이트
-    modal.find('h3').text(`스와이프 뷰어 (${currentSwipeIndex + 1}/${swipeData.swipes.length})`);
+    modal.find('.swipe-viewer-header h3').text(`스와이프 뷰어 (${currentSwipeIndex + 1}/${swipeData.swipes.length})`);
     
     // 텍스트 영역 업데이트
     modal.find('.swipe-text-area').val(swipeData.swipes[currentSwipeIndex] || '');
@@ -206,8 +229,14 @@ function updateSwipeDisplay() {
  */
 function closeSwipeViewerPopup() {
     if (currentPopup) {
-        currentPopup.hide();
-        currentPopup = null;
+        // 애니메이션과 함께 닫기
+        currentPopup.removeClass('visible');
+        currentPopup.find('.swipe-viewer-modal').removeClass('visible');
+        
+        setTimeout(() => {
+            currentPopup.remove();
+            currentPopup = null;
+        }, 300);
     }
     
     // 키보드 이벤트 핸들러 제거
