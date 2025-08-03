@@ -62,28 +62,6 @@ let markdownConverter = null;
 function initMarkdownConverter() {
     if (!markdownConverter) {
         markdownConverter = reloadMarkdownProcessor();
-        
-        // 마크다운 컨버터 설정 디버깅
-        if (markdownConverter) {
-            console.log('[스와이프 뷰어] 마크다운 컨버터 설정:', {
-                타입: typeof markdownConverter,
-                생성자: markdownConverter.constructor.name,
-                makeHtml: typeof markdownConverter.makeHtml,
-                옵션확인: markdownConverter.getOptions ? markdownConverter.getOptions() : '옵션함수없음'
-            });
-            
-            // 간단한 인용문 테스트
-            try {
-                const testResult = markdownConverter.makeHtml('> 테스트 인용문');
-                console.log('[스와이프 뷰어] 인용문 테스트 결과:', {
-                    입력: '> 테스트 인용문',
-                    출력: testResult,
-                    blockquote포함: testResult.includes('<blockquote>')
-                });
-            } catch (e) {
-                console.log('[스와이프 뷰어] 인용문 테스트 실패:', e);
-            }
-        }
     }
     return markdownConverter;
 }
@@ -96,17 +74,10 @@ function renderMarkdown(text) {
     
     try {
         const converter = initMarkdownConverter();
-        const result = converter.makeHtml(text);
+        let result = converter.makeHtml(text);
         
-        // 마크다운 변환 디버깅 (모든 텍스트)
-        if (text.includes('>')) {
-            console.log('[스와이프 뷰어] 마크다운 변환 테스트:', {
-                원본: text.substring(0, 150),
-                변환결과: result.substring(0, 300),
-                blockquote포함: result.includes('<blockquote>'),
-                converter설정: converter ? '로드됨' : '실패'
-            });
-        }
+        // 쌍따옴표로 감싼 "텍스트"에 인용 컬러 적용 (쌍따옴표 포함, 내용 수정 없음)
+        result = result.replace(/"([^"]+)"/g, '<span class="quote-text">"$1"</span>');
         
         return result;
     } catch (error) {
@@ -652,8 +623,8 @@ function applyChatFontStyles() {
             element.style.setProperty('font-family', userChatFontFamily, 'important');
             element.style.setProperty('font-size', userChatFontSize, 'important');
             
-            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 포함)
-            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td, code, pre');
+            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre, quote-text 포함)
+            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td, code, pre, .quote-text');
             markdownElements.forEach(mdElement => {
                 // 모든 요소에 사용자 채팅 폰트 적용
                 mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
