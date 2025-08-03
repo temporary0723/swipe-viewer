@@ -8,6 +8,7 @@ import {
     addOneMessage,
     getRequestHeaders,
     saveSettingsDebounced,
+    substituteParams,
 } from '../../../../script.js';
 
 import {
@@ -34,6 +35,10 @@ import {
 const pluginName = 'swipe-viewer';
 const MODAL_ID = 'swipeViewerModal';
 
+// LLM Translator DB 상수 (번역 지원용)
+const DB_NAME = 'LLMtranslatorDB';
+const STORE_NAME = 'translations';
+
 // 메시지 버튼 HTML (스와이프 아이콘)
 const messageButtonHtml = `
     <div class="mes_button swipe-viewer-icon interactable" title="스와이프 보기" tabindex="0">
@@ -45,6 +50,87 @@ const messageButtonHtml = `
 let currentPopup = null;
 let currentMessageIndex = -1;
 let currentSwipeIndex = 0;
+
+/**
+ * LLM Translator DB 열기
+ */
+async function openTranslatorDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        
+        request.onerror = () => {
+            console.warn('[SwipeViewer] LLM Translator DB를 열 수 없습니다:', request.error);
+            resolve(null); // DB가 없어도 계속 진행
+        };
+        
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+    });
+}
+
+/**
+ * 원문으로 번역문 가져오기
+ */
+async function getTranslationFromDB(originalText) {
+    try {
+        const db = await openTranslatorDB();
+        if (!db) return null;
+        
+        return new Promise((resolve) => {
+            const transaction = db.transaction(STORE_NAME, 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const index = store.index('originalText');
+            const request = index.get(originalText);
+            
+            request.onsuccess = (event) => {
+                const record = event.target.result;
+                resolve(record ? record.translation : null);
+            };
+            
+            request.onerror = () => {
+                resolve(null);
+            };
+            
+            transaction.oncomplete = () => {
+                db.close();
+            };
+        });
+    } catch (error) {
+        console.warn('[SwipeViewer] 번역문 조회 중 오류:', error);
+        return null;
+    }
+}
+
+/**
+ * 특정 스와이프의 번역문 가져오기
+ */
+async function getSwipeTranslation(messageIndex, swipeIndex) {
+    try {
+        if (messageIndex < 0 || messageIndex >= chat.length) {
+            return null;
+        }
+        
+        const message = chat[messageIndex];
+        if (!message || !message.swipes || swipeIndex >= message.swipes.length) {
+            return null;
+        }
+        
+        const swipeText = message.swipes[swipeIndex];
+        if (!swipeText) {
+            return null;
+        }
+        
+        // substituteParams를 사용해서 원문 처리 (LLM Translator 방식과 동일)
+        const context = getContext();
+        const originalText = substituteParams(swipeText, context.name1, message.name);
+        
+        return await getTranslationFromDB(originalText);
+    } catch (error) {
+        console.warn('[SwipeViewer] 스와이프 번역문 조회 중 오류:', error);
+        return null;
+    }
+}
 
 /**
  * 메시지에 스와이프 뷰어 아이콘 추가
@@ -92,7 +178,7 @@ function getSwipeData(messageIndex) {
 /**
  * 스와이프 뷰어 팝업 생성
  */
-function createSwipeViewerPopup(messageIndex) {
+async function createSwipeViewerPopup(messageIndex) {
     const swipeData = getSwipeData(messageIndex);
     if (!swipeData) {
         console.warn('스와이프 데이터가 없습니다.');
@@ -106,6 +192,10 @@ function createSwipeViewerPopup(messageIndex) {
     if (currentPopup) {
         closeSwipeViewerPopup();
     }
+    
+    // 현재 스와이프의 번역문 확인
+    const translation = await getSwipeTranslation(messageIndex, currentSwipeIndex);
+    const hasTranslation = translation && translation.trim();
     
     // 백드롭 생성
     const backdrop = $(`
@@ -121,7 +211,7 @@ function createSwipeViewerPopup(messageIndex) {
                             &lt;
                         </button>
                         <div class="swipe-viewer-content">
-                            <textarea readonly class="swipe-text-area">${swipeData.swipes[currentSwipeIndex] || ''}</textarea>
+                            ${createSwipeContentHTML(swipeData.swipes[currentSwipeIndex] || '', translation, hasTranslation)}
                         </div>
                         <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
                             &gt;
@@ -143,6 +233,32 @@ function createSwipeViewerPopup(messageIndex) {
     
     currentPopup = backdrop;
     setupPopupEventHandlers();
+}
+
+/**
+ * 스와이프 콘텐츠 HTML 생성 (번역문 유무에 따라 다르게)
+ */
+function createSwipeContentHTML(originalText, translation, hasTranslation) {
+    if (hasTranslation) {
+        return `
+            <div class="swipe-text-container dual-view">
+                <div class="swipe-text-section">
+                    <label class="swipe-text-label">원문</label>
+                    <textarea readonly class="swipe-text-area original-text">${originalText}</textarea>
+                </div>
+                <div class="swipe-text-section">
+                    <label class="swipe-text-label">번역문</label>
+                    <textarea readonly class="swipe-text-area translation-text">${translation}</textarea>
+                </div>
+            </div>
+        `;
+    } else {
+        return `
+            <div class="swipe-text-container single-view">
+                <textarea readonly class="swipe-text-area single-text">${originalText}</textarea>
+            </div>
+        `;
+    }
 }
 
 /**
@@ -207,7 +323,7 @@ function navigateSwipe(direction) {
 /**
  * 스와이프 디스플레이 업데이트
  */
-function updateSwipeDisplay() {
+async function updateSwipeDisplay() {
     const swipeData = getSwipeData(currentMessageIndex);
     if (!swipeData) return;
     
@@ -216,8 +332,14 @@ function updateSwipeDisplay() {
     // 헤더 업데이트
     modal.find('.swipe-viewer-header h3').text(`스와이프 뷰어 (${currentSwipeIndex + 1}/${swipeData.swipes.length})`);
     
-    // 텍스트 영역 업데이트
-    modal.find('.swipe-text-area').val(swipeData.swipes[currentSwipeIndex] || '');
+    // 현재 스와이프의 번역문 확인
+    const originalText = swipeData.swipes[currentSwipeIndex] || '';
+    const translation = await getSwipeTranslation(currentMessageIndex, currentSwipeIndex);
+    const hasTranslation = translation && translation.trim();
+    
+    // 콘텐츠 영역 전체 교체
+    const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
+    modal.find('.swipe-viewer-content').html(contentHTML);
     
     // 네비게이션 버튼 상태 업데이트
     modal.find('.swipe-prev').prop('disabled', currentSwipeIndex === 0);
@@ -271,7 +393,7 @@ function initializeSwipeViewer() {
     eventSource.on(event_types.CHAT_CHANGED, handleMessageUpdate);
     
     // 스와이프 뷰어 아이콘 클릭 이벤트
-    $(document).on('click', '.swipe-viewer-icon', function(event) {
+    $(document).on('click', '.swipe-viewer-icon', async function(event) {
         event.preventDefault();
         event.stopPropagation();
         
@@ -281,7 +403,7 @@ function initializeSwipeViewer() {
         
         if (messageId !== undefined) {
             const messageIndex = parseInt(messageId);
-            createSwipeViewerPopup(messageIndex);
+            await createSwipeViewerPopup(messageIndex);
         }
     });
     
