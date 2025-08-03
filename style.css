@@ -1,0 +1,224 @@
+/* 스와이프 뷰어 확장 스타일 */
+
+/* 메시지 버튼 스타일 */
+.swipe-viewer-icon {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 3px;
+}
+
+.swipe-viewer-icon:hover {
+    background-color: var(--SmartThemeBodyColor);
+    color: var(--SmartThemeAccentColor);
+}
+
+.swipe-viewer-icon i {
+    font-size: 14px;
+}
+
+/* 팝업 모달 스타일 */
+.swipe-viewer-modal {
+    max-width: 80vw;
+    max-height: 80vh;
+    width: 600px;
+    height: 500px;
+    background: var(--SmartThemeBodyColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 헤더 스타일 */
+.swipe-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--SmartThemeQuoteColor);
+    border-bottom: 1px solid var(--SmartThemeBorderColor);
+    color: var(--SmartThemeEmColor);
+}
+
+.swipe-viewer-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.swipe-viewer-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--SmartThemeEmColor);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.swipe-viewer-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 바디 스타일 */
+.swipe-viewer-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* 네비게이션 컨테이너 */
+.swipe-viewer-navigation {
+    display: flex;
+    align-items: stretch;
+    gap: 15px;
+    height: 100%;
+}
+
+.swipe-nav-btn {
+    background: var(--SmartThemeAccentColor);
+    color: var(--SmartThemeBodyColor);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 50px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swipe-nav-btn:hover:not(:disabled) {
+    background: var(--SmartThemeQuoteColor);
+    transform: translateY(-1px);
+}
+
+.swipe-nav-btn:disabled {
+    background: var(--SmartThemeBorderColor);
+    color: var(--SmartThemeEmColor);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 콘텐츠 영역 */
+.swipe-viewer-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.swipe-text-area {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 6px;
+    padding: 15px;
+    background: var(--SmartThemeBodyColor);
+    color: var(--SmartThemeEmColor);
+    font-family: var(--mainFontFamily);
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.swipe-text-area:focus {
+    border-color: var(--SmartThemeAccentColor);
+    box-shadow: 0 0 0 2px rgba(var(--SmartThemeAccentColorRGB), 0.2);
+}
+
+/* 스크롤바 스타일 */
+.swipe-text-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.swipe-text-area::-webkit-scrollbar-track {
+    background: var(--SmartThemeBodyColor);
+    border-radius: 4px;
+}
+
+.swipe-text-area::-webkit-scrollbar-thumb {
+    background: var(--SmartThemeBorderColor);
+    border-radius: 4px;
+}
+
+.swipe-text-area::-webkit-scrollbar-thumb:hover {
+    background: var(--SmartThemeQuoteColor);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .swipe-viewer-modal {
+        width: 95vw;
+        height: 70vh;
+        max-width: none;
+    }
+    
+    .swipe-viewer-navigation {
+        gap: 10px;
+    }
+    
+    .swipe-nav-btn {
+        min-width: 40px;
+        padding: 8px 12px;
+        font-size: 16px;
+    }
+    
+    .swipe-viewer-header {
+        padding: 12px 15px;
+    }
+    
+    .swipe-viewer-body {
+        padding: 15px;
+    }
+}
+
+/* 다크 테마 지원 */
+[data-theme="dark"] .swipe-viewer-modal {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* 애니메이션 */
+.swipe-viewer-modal {
+    animation: swipeViewerFadeIn 0.3s ease-out;
+}
+
+@keyframes swipeViewerFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 호버 효과 */
+.swipe-viewer-icon:active {
+    transform: scale(0.95);
+}
+
+.swipe-nav-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* 접근성 */
+.swipe-viewer-modal:focus-within {
+    outline: 2px solid var(--SmartThemeAccentColor);
+    outline-offset: 2px;
+}
