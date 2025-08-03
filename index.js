@@ -592,6 +592,8 @@ async function navigateSwipe(direction) {
  * 실제 채팅 메시지 폰트 스타일 적용
  */
 function applyChatFontStyles() {
+    console.log('[스와이프 뷰어] 폰트 스타일 적용 시작');
+    
     // 실제 채팅 메시지에서 폰트 스타일 가져오기
     const actualMesText = document.querySelector('#chat .mes .mes_text');
     if (actualMesText) {
@@ -601,13 +603,46 @@ function applyChatFontStyles() {
         const fontWeight = computedStyle.fontWeight;
         const lineHeight = computedStyle.lineHeight;
         
+        console.log('[스와이프 뷰어] 실제 채팅 메시지 폰트:', {
+            fontFamily, fontSize, fontWeight, lineHeight
+        });
+        
+        // 전역 폰트와 비교 (body 폰트)
+        const bodyStyle = window.getComputedStyle(document.body);
+        console.log('[스와이프 뷰어] Body 폰트:', {
+            fontFamily: bodyStyle.fontFamily,
+            fontSize: bodyStyle.fontSize
+        });
+        
+        // 모달의 현재 폰트 확인
+        const modal = document.querySelector('.swipe-viewer-modal');
+        if (modal) {
+            const modalStyle = window.getComputedStyle(modal);
+            console.log('[스와이프 뷰어] 모달 폰트:', {
+                fontFamily: modalStyle.fontFamily,
+                fontSize: modalStyle.fontSize
+            });
+        }
+        
         // 스와이프 뷰어 텍스트 콘텐츠에 동일한 폰트 스타일 적용
         const swipeTextElements = document.querySelectorAll('.swipe-text-content.mes_text');
-        swipeTextElements.forEach(element => {
+        console.log('[스와이프 뷰어] 스와이프 텍스트 요소 개수:', swipeTextElements.length);
+        
+        swipeTextElements.forEach((element, index) => {
+            console.log(`[스와이프 뷰어] 요소 ${index} 폰트 적용 전:`, {
+                fontFamily: window.getComputedStyle(element).fontFamily,
+                fontSize: window.getComputedStyle(element).fontSize
+            });
+            
             element.style.fontFamily = fontFamily;
             element.style.fontSize = fontSize;
             element.style.fontWeight = fontWeight;
             element.style.lineHeight = lineHeight;
+            
+            console.log(`[스와이프 뷰어] 요소 ${index} 폰트 적용 후:`, {
+                fontFamily: window.getComputedStyle(element).fontFamily,
+                fontSize: window.getComputedStyle(element).fontSize
+            });
             
             // 마크다운 요소들에도 폰트 적용 (code, pre code 제외)
             const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td');
@@ -619,6 +654,8 @@ function applyChatFontStyles() {
                 }
             });
         });
+    } else {
+        console.log('[스와이프 뷰어] 실제 채팅 메시지 요소를 찾을 수 없습니다');
     }
 }
 
