@@ -249,6 +249,11 @@ async function createSwipeViewerPopup(messageIndex) {
     
     currentPopup = backdrop;
     setupPopupEventHandlers();
+    
+    // 최초 팝업 생성 시에도 복사 버튼 이벤트 등록
+    console.log('[스와이프 뷰어] 🚀 최초 팝업 생성 완료, 복사 버튼 이벤트 등록 시작');
+    const originalText = swipeData.swipes[currentSwipeIndex] || '';
+    setupCopyButtonEvents(backdrop, originalText, translation);
 }
 
 /**
@@ -359,6 +364,7 @@ function showCopyFeedback(button, success) {
  * 복사 버튼 이벤트 등록
  */
 function setupCopyButtonEvents(modal, originalText, translation) {
+    console.log('[스와이프 뷰어] 🎯🎯🎯 setupCopyButtonEvents 함수 진입! 🎯🎯🎯');
     console.log('[스와이프 뷰어] ========== 복사 버튼 이벤트 등록 시작 ==========');
     console.log('[스와이프 뷰어] 모달 요소:', modal);
     console.log('[스와이프 뷰어] 모달 존재 여부:', modal.length > 0);
@@ -656,8 +662,17 @@ function navigateSwipe(direction) {
  * 스와이프 디스플레이 업데이트
  */
 async function updateSwipeDisplay() {
+    console.log('[스와이프 뷰어] 🔄 updateSwipeDisplay 시작!');
+    console.log('[스와이프 뷰어] currentMessageIndex:', currentMessageIndex);
+    console.log('[스와이프 뷰어] currentSwipeIndex:', currentSwipeIndex);
+    
     const swipeData = getSwipeData(currentMessageIndex);
-    if (!swipeData) return;
+    if (!swipeData) {
+        console.error('[스와이프 뷰어] ❌ swipeData 없음!');
+        return;
+    }
+    
+    console.log('[스와이프 뷰어] ✅ swipeData 확인됨, 스와이프 수:', swipeData.swipes.length);
     
     const modal = $(`#${MODAL_ID}`);
     
@@ -687,7 +702,15 @@ async function updateSwipeDisplay() {
     });
     
     // 복사 버튼 이벤트 등록 (새로 생성된 버튼들에 대해)
-    setupCopyButtonEvents(modal, originalText, translation);
+    console.log('[스와이프 뷰어] 🔥 setupCopyButtonEvents 호출 직전!');
+    console.log('[스와이프 뷰어] 전달할 파라미터 - modal:', modal.length, 'originalText:', originalText?.length, 'translation:', translation?.length);
+    
+    try {
+        setupCopyButtonEvents(modal, originalText, translation);
+        console.log('[스와이프 뷰어] ✅ setupCopyButtonEvents 호출 완료!');
+    } catch (error) {
+        console.error('[스와이프 뷰어] ❌ setupCopyButtonEvents 오류:', error);
+    }
     
     // 뷰 모드 드롭다운 상태 업데이트
     const dropdown = modal.find('.view-mode-dropdown');
