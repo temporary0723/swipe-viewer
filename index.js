@@ -208,7 +208,7 @@ async function createSwipeViewerPopup(messageIndex) {
                             &lt;
                         </button>
                         <div class="swipe-viewer-controls">
-                            ${hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : ''}
+                            ${hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : '<span class="translation-placeholder"></span>'}
                         </div>
                         <button class="swipe-nav-btn swipe-next" title="다음 스와이프" ${currentSwipeIndex >= swipeData.swipes.length - 1 ? 'disabled' : ''}>
                             &gt;
@@ -352,7 +352,7 @@ async function updateSwipeDisplay() {
     modal.find('.swipe-viewer-content').html(contentHTML);
     
     // 네비게이션 영역 업데이트 (컨트롤 버튼 포함)
-    const controlsHTML = hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : '';
+    const controlsHTML = hasTranslation ? `<button class="translation-toggle" title="번역문 표시/숨김">번역문 ${showTranslation ? '숨김' : '표시'}</button>` : '<span class="translation-placeholder"></span>';
     modal.find('.swipe-viewer-controls').html(controlsHTML);
     
     // 번역문 토글 이벤트 다시 바인딩
