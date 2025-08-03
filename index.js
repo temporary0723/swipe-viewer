@@ -264,100 +264,14 @@ function getViewModeText(mode) {
 }
 
 /**
- * 간단한 마크다운 파싱
- */
-function parseMarkdown(text) {
-    if (!text) return '';
-    
-    return text
-        // HTML 특수문자 이스케이프
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        // 마크다운 파싱
-        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>') // ***bold italic***
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **bold**
-        .replace(/\*(.*?)\*/g, '<em>$1</em>') // *italic*
-        .replace(/`(.*?)`/g, '<code>$1</code>') // `code`
-        .replace(/~~(.*?)~~/g, '<del>$1</del>') // ~~strikethrough~~
-        .replace(/^### (.*$)/gm, '<h3>$1</h3>') // ### header3
-        .replace(/^## (.*$)/gm, '<h2>$1</h2>') // ## header2
-        .replace(/^# (.*$)/gm, '<h1>$1</h1>') // # header1
-        .replace(/^\> (.*$)/gm, '<blockquote>$1</blockquote>') // > quote
-        .replace(/^\- (.*$)/gm, '<li>$1</li>') // - list
-        .replace(/^\* (.*$)/gm, '<li>$1</li>') // * list
-        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>') // wrap lists
-        .replace(/\n/g, '<br>'); // line breaks
-}
-
-/**
- * 텍스트 복사하기 (이벤트 위임 방식)
- */
-async function copyToClipboard(button) {
-    try {
-        // data-text 속성에서 원본 텍스트 가져오기
-        const originalText = button.getAttribute('data-text');
-        if (!originalText) {
-            console.error('복사할 텍스트가 없습니다.');
-            return;
-        }
-        
-        await navigator.clipboard.writeText(originalText);
-        
-        // 복사 완료 피드백
-        const originalIcon = button.innerHTML;
-        button.innerHTML = '<i class="fa-solid fa-check"></i>';
-        button.style.color = '#4CAF50';
-        
-        setTimeout(() => {
-            button.innerHTML = originalIcon;
-            button.style.color = '';
-        }, 1500);
-        
-    } catch (err) {
-        console.error('클립보드 복사 실패:', err);
-        
-        // 폴백: 텍스트 선택
-        const originalText = button.getAttribute('data-text');
-        const textArea = document.createElement('textarea');
-        textArea.value = originalText;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        
-        // 복사 완료 피드백
-        const originalIcon = button.innerHTML;
-        button.innerHTML = '<i class="fa-solid fa-check"></i>';
-        button.style.color = '#4CAF50';
-        
-        setTimeout(() => {
-            button.innerHTML = originalIcon;
-            button.style.color = '';
-        }, 1500);
-    }
-}
-
-/**
  * 스와이프 콘텐츠 HTML 생성 (번역문 유무 및 뷰 모드에 따라 다르게)
  */
 function createSwipeContentHTML(originalText, translation, hasTranslation) {
-    // HTML 속성용 텍스트 이스케이핑
-    const escapeHtml = (text) => {
-        return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    };
-    
     // 번역문이 없으면 원문만 표시
     if (!hasTranslation) {
-        const parsedOriginal = parseMarkdown(originalText);
         return `
             <div class="swipe-text-container single-view">
-                <div class="swipe-text-header">
-                    <button class="copy-btn-target" data-text="${escapeHtml(originalText)}" title="텍스트 복사">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
-                </div>
-                <div class="swipe-text-area single-text">${parsedOriginal}</div>
+                <textarea readonly class="swipe-text-area single-text">${originalText}</textarea>
             </div>
         `;
     }
@@ -365,16 +279,10 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
     // 번역문이 있을 때 뷰 모드에 따라 결정
     switch (currentViewMode) {
         case 'original':
-            const parsedOriginalOnly = parseMarkdown(originalText);
             return `
                 <div class="swipe-text-container single-view">
-                    <div class="swipe-text-header">
-                        <label class="swipe-text-label">원문</label>
-                        <button class="copy-btn-target" data-text="${escapeHtml(originalText)}" title="원문 복사">
-                            <i class="fa-solid fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="swipe-text-area original-text single-mode">${parsedOriginalOnly}</div>
+                    <label class="swipe-text-label">원문</label>
+                    <textarea readonly class="swipe-text-area original-text single-mode">${originalText}</textarea>
                 </div>
             `;
         case 'translation':
@@ -390,41 +298,23 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                     </div>
                 `;
             }
-            const parsedTranslationOnly = parseMarkdown(translation);
             return `
                 <div class="swipe-text-container single-view">
-                    <div class="swipe-text-header">
-                        <label class="swipe-text-label">번역문</label>
-                        <button class="copy-btn-target" data-text="${escapeHtml(translation)}" title="번역문 복사">
-                            <i class="fa-solid fa-copy"></i>
-                        </button>
-                    </div>
-                    <div class="swipe-text-area translation-text single-mode">${parsedTranslationOnly}</div>
+                    <label class="swipe-text-label">번역문</label>
+                    <textarea readonly class="swipe-text-area translation-text single-mode">${translation}</textarea>
                 </div>
             `;
         case 'both':
         default:
-            const parsedOriginalBoth = parseMarkdown(originalText);
-            const parsedTranslationBoth = parseMarkdown(translation);
             return `
                 <div class="swipe-text-container dual-view">
                     <div class="swipe-text-section">
-                        <div class="swipe-text-header">
-                            <label class="swipe-text-label">원문</label>
-                            <button class="copy-btn-target" data-text="${escapeHtml(originalText)}" title="원문 복사">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="swipe-text-area original-text">${parsedOriginalBoth}</div>
+                        <label class="swipe-text-label">원문</label>
+                        <textarea readonly class="swipe-text-area original-text">${originalText}</textarea>
                     </div>
                     <div class="swipe-text-section">
-                        <div class="swipe-text-header">
-                            <label class="swipe-text-label">번역문</label>
-                            <button class="copy-btn-target" data-text="${escapeHtml(translation)}" title="번역문 복사">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="swipe-text-area translation-text">${parsedTranslationBoth}</div>
+                        <label class="swipe-text-label">번역문</label>
+                        <textarea readonly class="swipe-text-area translation-text">${translation}</textarea>
                     </div>
                 </div>
             `;
@@ -489,13 +379,6 @@ function setupPopupEventHandlers() {
         if (!$(e.target).closest('.view-mode-dropdown').length) {
             modal.find('.view-mode-dropdown').removeClass('open');
         }
-    });
-    
-    // 복사 버튼 이벤트 (이벤트 위임)
-    modal.on('click', '.copy-btn-target', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        copyToClipboard(this);
     });
     
     // 키보드 네비게이션
