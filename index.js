@@ -286,6 +286,18 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                 </div>
             `;
         case 'translation':
+            if (!translation || !translation.trim()) {
+                return `
+                    <div class="swipe-text-container single-view">
+                        <div class="no-translation-notice">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <h4>번역문이 없습니다</h4>
+                            <p>이 스와이프에는 번역된 텍스트가 없습니다.<br/>
+                            드롭다운에서 다른 보기 모드를 선택해보세요.</p>
+                        </div>
+                    </div>
+                `;
+            }
             return `
                 <div class="swipe-text-container single-view">
                     <label class="swipe-text-label">번역문</label>
@@ -431,15 +443,11 @@ async function updateSwipeDisplay() {
     const translationOption = modal.find('.view-mode-option[data-mode="translation"]');
     if (hasTranslation) {
         translationOption.show();
+        translationOption.removeClass('disabled');
     } else {
-        translationOption.hide();
-        // 번역문이 없는데 번역문만 보기 모드면 원문/번역문 보기로 변경
-        if (currentViewMode === 'translation') {
-            currentViewMode = 'both';
-            modal.find('.view-mode-text').text(getViewModeText(currentViewMode));
-            modal.find('.view-mode-option').removeClass('active');
-            modal.find('.view-mode-option[data-mode="both"]').addClass('active');
-        }
+        translationOption.show(); // 번역문이 없어도 옵션은 보이게 함
+        // 번역문이 없을 때는 옵션을 비활성화 상태로 표시
+        translationOption.addClass('disabled');
     }
     
     // 네비게이션 버튼 상태 업데이트
