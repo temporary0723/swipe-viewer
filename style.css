@@ -402,7 +402,7 @@
 .swipe-text-content h4,
 .swipe-text-content h5,
 .swipe-text-content h6 {
-    color: var(--user-plain-color, var(--SmartThemeBodyColor));
+    color: var(--SmartThemeBodyColor);
     margin: 1em 0 0.5em 0;
     font-weight: 600;
 }
@@ -418,7 +418,6 @@
 
 .swipe-text-content p {
     margin: 0 0 1em 0;
-    color: var(--user-plain-color, var(--SmartThemeBodyColor));
 }
 
 .swipe-text-content p:last-child {
@@ -428,37 +427,26 @@
 .swipe-text-content strong, 
 .swipe-text-content b {
     font-weight: 600;
-    color: var(--user-plain-color, var(--SmartThemeHighlightColor, var(--SmartThemeBodyColor)));
+    color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor));
 }
 
 .swipe-text-content em, 
 .swipe-text-content i {
     font-style: italic;
-    color: var(--user-italic-color, var(--SmartThemeQuoteColor));
-}
-
-.swipe-text-content q {
-    color: var(--user-quote-color, var(--SmartThemeQuoteColor));
-    font-style: italic;
-}
-
-.swipe-text-content u {
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
-    text-decoration: underline;
-    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor));
+    color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor));
 }
 
 .swipe-text-content code {
-    background: var(--SmartThemeCodeBackgroundColor, var(--black30a));
-    color: var(--SmartThemeCodeColor, var(--SmartThemeQuoteColor));
+    background: var(--black30a);
+    color: var(--SmartThemeQuoteColor);
     padding: 2px 4px;
     border-radius: 3px;
     /* JavaScript에서 사용자 폰트가 동적으로 적용됨 */
 }
 
 .swipe-text-content pre {
-    background: var(--SmartThemePreBackgroundColor, var(--black30a));
-    color: var(--SmartThemePreColor, var(--SmartThemeBodyColor));
+    background: var(--black30a);
+    color: var(--SmartThemeBodyColor);
     padding: 12px;
     border-radius: 6px;
     overflow-x: auto;
@@ -475,10 +463,10 @@
 }
 
 .swipe-text-content blockquote {
-    border-left: 4px solid var(--user-quote-color, var(--SmartThemeQuoteColor));
+    border-left: 4px solid var(--SmartThemeQuoteColor);
     padding-left: 12px;
     margin: 1em 0;
-    color: var(--user-quote-color, var(--SmartThemeQuoteColor));
+    color: var(--SmartThemeQuoteColor, var(--SmartThemeBodyColor));
     opacity: 0.9;
     font-style: italic;
 }
@@ -487,23 +475,23 @@
 .swipe-text-content ol {
     margin: 1em 0;
     padding-left: 2em;
-    color: var(--user-plain-color, var(--SmartThemeBodyColor));
+    color: var(--SmartThemeBodyColor);
 }
 
 .swipe-text-content li {
     margin: 0.5em 0;
-    color: var(--user-plain-color, var(--SmartThemeBodyColor));
+    color: var(--SmartThemeBodyColor);
 }
 
 .swipe-text-content a {
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
+    color: var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor));
     text-decoration: underline;
-    text-decoration-color: var(--user-under-color, var(--SmartThemeUnderlineColor));
+    text-decoration-color: var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor));
 }
 
 .swipe-text-content a:hover {
     opacity: 0.8;
-    color: var(--user-under-color, var(--SmartThemeUnderlineColor));
+    color: var(--SmartThemeUnderlineColor, var(--SmartThemeQuoteColor));
 }
 
 .swipe-text-content table {

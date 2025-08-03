@@ -74,7 +74,18 @@ function renderMarkdown(text) {
     
     try {
         const converter = initMarkdownConverter();
-        return converter.makeHtml(text);
+        const result = converter.makeHtml(text);
+        
+        // 인용문 디버깅을 위한 임시 로그
+        if (text.includes('>') && text.includes('인용')) {
+            console.log('[스와이프 뷰어] 인용문 변환 테스트:', {
+                원본: text.substring(0, 100),
+                변환결과: result.substring(0, 200),
+                blockquote포함: result.includes('<blockquote>')
+            });
+        }
+        
+        return result;
     } catch (error) {
         // 마크다운 렌더링에 실패하면 원본 텍스트 반환 (HTML escape 처리)
         return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
@@ -618,53 +629,12 @@ function applyChatFontStyles() {
             element.style.setProperty('font-family', userChatFontFamily, 'important');
             element.style.setProperty('font-size', userChatFontSize, 'important');
             
-            // 마크다운 요소들에도 사용자 폰트 적용 (모든 텍스트 요소 포함)
-            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, q, u, blockquote, ul, ol, li, a, table, th, td, code, pre');
+            // 마크다운 요소들에도 사용자 폰트 적용 (code, pre 포함)
+            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td, code, pre');
             markdownElements.forEach(mdElement => {
                 // 모든 요소에 사용자 채팅 폰트 적용
                 mdElement.style.setProperty('font-family', userChatFontFamily, 'important');
                 mdElement.style.setProperty('font-size', userChatFontSize, 'important');
-            });
-            
-            // 색상 변수 디버깅
-            console.log('[스와이프 뷰어] 색상 변수 디버깅 시작');
-            
-            // CSS 변수들이 정의되어 있는지 확인
-            const rootStyle = window.getComputedStyle(document.documentElement);
-            const testVariables = [
-                '--user-plain-color',
-                '--user-italic-color', 
-                '--user-quote-color',
-                '--user-under-color',
-                '--SmartThemeBodyColor',
-                '--SmartThemeQuoteColor',
-                '--SmartThemeItalicColor',
-                '--SmartThemeUnderlineColor'
-            ];
-            
-            console.log('[스와이프 뷰어] 정의된 CSS 변수들:');
-            testVariables.forEach(varName => {
-                const value = rootStyle.getPropertyValue(varName);
-                console.log(`  ${varName}: "${value}"`);
-            });
-            
-            // 실제 요소들의 색상 확인
-            const testElements = {
-                'em': element.querySelector('em'),
-                'i': element.querySelector('i'), 
-                'q': element.querySelector('q'),
-                'u': element.querySelector('u'),
-                'strong': element.querySelector('strong'),
-                'p': element.querySelector('p'),
-                'a': element.querySelector('a')
-            };
-            
-            console.log('[스와이프 뷰어] 실제 요소들의 적용된 색상:');
-            Object.entries(testElements).forEach(([tagName, elem]) => {
-                if (elem) {
-                    const style = window.getComputedStyle(elem);
-                    console.log(`  ${tagName}: color="${style.color}", font-family="${style.fontFamily}"`);
-                }
             });
         });
     }
