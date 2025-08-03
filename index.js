@@ -76,7 +76,6 @@ function renderMarkdown(text) {
         const converter = initMarkdownConverter();
         return converter.makeHtml(text);
     } catch (error) {
-        console.warn('[SwipeViewer] 마크다운 렌더링 중 오류:', error);
         // 마크다운 렌더링에 실패하면 원본 텍스트 반환 (HTML escape 처리)
         return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     }
@@ -90,7 +89,7 @@ async function openTranslatorDB() {
         const request = indexedDB.open(DB_NAME, 1);
         
         request.onerror = () => {
-            console.warn('[SwipeViewer] LLM Translator DB를 열 수 없습니다:', request.error);
+
             resolve(null); // DB가 없어도 계속 진행
         };
         
@@ -128,7 +127,6 @@ async function getTranslationFromDB(originalText) {
             };
         });
     } catch (error) {
-        console.warn('[SwipeViewer] 번역문 조회 중 오류:', error);
         return null;
     }
 }
@@ -158,7 +156,6 @@ async function getSwipeTranslation(messageIndex, swipeIndex) {
         
         return await getTranslationFromDB(originalText);
     } catch (error) {
-        console.warn('[SwipeViewer] 스와이프 번역문 조회 중 오류:', error);
         return null;
     }
 }
@@ -205,7 +202,6 @@ function getSwipeData(messageIndex) {
 async function createSwipeViewerPopup(messageIndex) {
     const swipeData = getSwipeData(messageIndex);
     if (!swipeData) {
-        console.warn('스와이프 데이터가 없습니다.');
         return;
     }
     
@@ -284,10 +280,10 @@ async function createSwipeViewerPopup(messageIndex) {
     const originalText = swipeData.swipes[currentSwipeIndex] || '';
     setupCopyButtonEvents(backdrop, originalText, translation);
     
-    // 폰트 디버깅 로그 출력 (팝업 생성 후)
+    // 실제 채팅 메시지 폰트 스타일 적용
     setTimeout(() => {
-        logFontStyles();
-    }, 200);
+        applyChatFontStyles();
+    }, 50);
 }
 
 /**
@@ -438,7 +434,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
     // 번역문이 있을 때 뷰 모드에 따라 결정
     switch (currentViewMode) {
         case 'original':
-            console.log('[스와이프 뷰어] 원문만 보기 뷰 생성 중');
+    
             return `
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
@@ -452,7 +448,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
             `;
         case 'translation':
             if (!translation || !translation.trim()) {
-                console.log('[스와이프 뷰어] 번역문 없음 안내 표시');
+        
                 return `
                     <div class="swipe-text-container single-view">
                         <div class="no-translation-notice">
@@ -464,7 +460,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                     </div>
                 `;
             }
-            console.log('[스와이프 뷰어] 번역문만 보기 뷰 생성 중');
+    
             return `
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
@@ -478,7 +474,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
             `;
         case 'both':
         default:
-            console.log('[스와이프 뷰어] 이중 뷰 생성 중');
+    
             return `
                 <div class="swipe-text-container dual-view">
                     <div class="swipe-text-section">
@@ -590,56 +586,39 @@ async function navigateSwipe(direction) {
     await updateSwipeDisplay();
 }
 
+
+
 /**
- * 폰트 디버깅 로그 출력
+ * 실제 채팅 메시지 폰트 스타일 적용
  */
-function logFontStyles() {
-    try {
-        console.log('[스와이프 뷰어] 폰트 디버깅 시작');
+function applyChatFontStyles() {
+    // 실제 채팅 메시지에서 폰트 스타일 가져오기
+    const actualMesText = document.querySelector('#chat .mes .mes_text');
+    if (actualMesText) {
+        const computedStyle = window.getComputedStyle(actualMesText);
+        const fontFamily = computedStyle.fontFamily;
+        const fontSize = computedStyle.fontSize;
+        const fontWeight = computedStyle.fontWeight;
+        const lineHeight = computedStyle.lineHeight;
         
-        // .mes_text 요소의 폰트 스타일 확인
-        const mesTextElements = document.querySelectorAll('.mes_text');
-        if (mesTextElements.length > 0) {
-            const mesTextStyle = window.getComputedStyle(mesTextElements[0]);
-            console.log('[스와이프 뷰어] .mes_text 폰트:', {
-                fontFamily: mesTextStyle.fontFamily,
-                fontSize: mesTextStyle.fontSize,
-                fontWeight: mesTextStyle.fontWeight
+        // 스와이프 뷰어 텍스트 콘텐츠에 동일한 폰트 스타일 적용
+        const swipeTextElements = document.querySelectorAll('.swipe-text-content.mes_text');
+        swipeTextElements.forEach(element => {
+            element.style.fontFamily = fontFamily;
+            element.style.fontSize = fontSize;
+            element.style.fontWeight = fontWeight;
+            element.style.lineHeight = lineHeight;
+            
+            // 마크다운 요소들에도 폰트 적용 (code, pre code 제외)
+            const markdownElements = element.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong, b, em, i, blockquote, ul, ol, li, a, table, th, td');
+            markdownElements.forEach(mdElement => {
+                // code나 pre 태그는 monospace 유지
+                if (!mdElement.closest('code') && !mdElement.closest('pre')) {
+                    mdElement.style.fontFamily = fontFamily;
+                    mdElement.style.fontSize = fontSize;
+                }
             });
-        }
-        
-        // 스와이프 뷰어 텍스트 콘텐츠의 폰트 스타일 확인
-        const swipeTextElements = document.querySelectorAll('.swipe-text-content');
-        if (swipeTextElements.length > 0) {
-            const swipeTextStyle = window.getComputedStyle(swipeTextElements[0]);
-            console.log('[스와이프 뷰어] .swipe-text-content 폰트:', {
-                fontFamily: swipeTextStyle.fontFamily,
-                fontSize: swipeTextStyle.fontSize,
-                fontWeight: swipeTextStyle.fontWeight
-            });
-        }
-        
-        // body의 폰트 스타일 확인
-        const bodyStyle = window.getComputedStyle(document.body);
-        console.log('[스와이프 뷰어] body 폰트:', {
-            fontFamily: bodyStyle.fontFamily,
-            fontSize: bodyStyle.fontSize
         });
-        
-        // 실제 메시지 요소 확인
-        const actualMesText = document.querySelector('#chat .mes .mes_text');
-        if (actualMesText) {
-            const actualStyle = window.getComputedStyle(actualMesText);
-            console.log('[스와이프 뷰어] 실제 채팅 메시지 폰트:', {
-                fontFamily: actualStyle.fontFamily,
-                fontSize: actualStyle.fontSize,
-                fontWeight: actualStyle.fontWeight
-            });
-        }
-        
-        console.log('[스와이프 뷰어] 폰트 디버깅 완료');
-    } catch (error) {
-        console.error('[스와이프 뷰어] 폰트 디버깅 중 오류:', error);
     }
 }
 
@@ -664,10 +643,10 @@ async function updateSwipeDisplay() {
     const contentHTML = createSwipeContentHTML(originalText, translation, hasTranslation);
     modal.find('.swipe-viewer-content').html(contentHTML);
     
-    // 폰트 디버깅 로그 출력 (콘텐츠 생성 후)
+    // 실제 채팅 메시지 폰트 스타일 적용
     setTimeout(() => {
-        logFontStyles();
-    }, 100);
+        applyChatFontStyles();
+    }, 10);
     
     // 복사 버튼 이벤트 등록 (새로 생성된 버튼들에 대해)
     setupCopyButtonEvents(modal, originalText, translation);
@@ -736,7 +715,7 @@ function handleMessageUpdate() {
  * 확장 초기화
  */
 function initializeSwipeViewer() {
-    console.log(`[${pluginName}] 스와이프 뷰어 확장 초기화 중...`);
+
     
     // 마크다운 컨버터 초기화
     initMarkdownConverter();
@@ -764,14 +743,12 @@ function initializeSwipeViewer() {
         }
     });
     
-    console.log(`[${pluginName}] 스와이프 뷰어 확장 초기화 완료!`);
+
 }
 
 // 복사 기능이 직접 이벤트 등록 방식으로 처리됨
-console.log('[스와이프 뷰어] 복사 기능이 직접 이벤트 등록 방식으로 처리됩니다');
 
 // jQuery 준비 완료 시 초기화
 jQuery(() => {
-    console.log('[스와이프 뷰어] jQuery 준비 완료, 초기화 시작');
     initializeSwipeViewer();
 });

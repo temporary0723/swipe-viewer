@@ -395,23 +395,20 @@
     line-height: 1.6;
 }
 
-/* 스와이프 뷰어 텍스트가 채팅 메시지와 동일한 폰트 사용하도록 강제 */
+/* 스와이프 뷰어 텍스트가 채팅 메시지와 동일한 폰트 사용 */
 .swipe-text-content.mes_text {
-    /* .mes_text의 모든 스타일 상속 */
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    line-height: inherit !important;
+    /* JavaScript에서 실제 채팅 메시지 폰트를 동적으로 적용 */
+    /* CSS는 기본값만 설정하고 JS에서 overwrite */
 }
 
-/* 스와이프 뷰어 내부의 모든 요소가 메시지 폰트 사용 */
+/* 스와이프 뷰어 내부의 모든 요소가 부모의 폰트 상속 */
 .swipe-text-content.mes_text * {
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
-/* 마크다운 렌더링 요소 스타일 (사용자 폰트 설정 상속) - 강화된 inherit */
+/* 마크다운 렌더링 요소 스타일 (JavaScript에서 설정된 폰트 상속) */
 .swipe-text-content.mes_text h1,
 .swipe-text-content.mes_text h2,
 .swipe-text-content.mes_text h3,
@@ -421,8 +418,8 @@
     color: var(--SmartThemeBodyColor);
     margin: 1em 0 0.5em 0;
     font-weight: 600;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text h1:first-child,
@@ -436,8 +433,8 @@
 
 .swipe-text-content.mes_text p {
     margin: 0 0 1em 0;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text p:last-child {
@@ -448,16 +445,16 @@
 .swipe-text-content.mes_text b {
     font-weight: 600;
     color: var(--SmartThemeBodyColor);
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text em, 
 .swipe-text-content.mes_text i {
     font-style: italic;
     color: var(--SmartThemeBodyColor);
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text code {
@@ -465,8 +462,8 @@
     color: var(--SmartThemeQuoteColor);
     padding: 2px 4px;
     border-radius: 3px;
-    font-family: monospace !important; /* 코드는 모노스페이스 폰트 사용 */
-    font-size: 0.9em !important;
+    font-family: monospace; /* 코드는 모노스페이스 폰트 사용 */
+    font-size: 0.9em;
 }
 
 .swipe-text-content.mes_text pre {
@@ -477,14 +474,14 @@
     overflow-x: auto;
     margin: 1em 0;
     border: 1px solid var(--SmartThemeBorderColor);
-    font-family: inherit !important;
+    font-family: inherit;
 }
 
 .swipe-text-content.mes_text pre code {
     background: none;
     padding: 0;
     color: inherit;
-    font-family: monospace !important;
+    font-family: monospace;
 }
 
 .swipe-text-content.mes_text blockquote {
@@ -494,29 +491,29 @@
     color: var(--SmartThemeBodyColor);
     opacity: 0.9;
     font-style: italic;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text ul,
 .swipe-text-content.mes_text ol {
     margin: 1em 0;
     padding-left: 2em;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text li {
     margin: 0.5em 0;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text a {
     color: var(--SmartThemeQuoteColor);
     text-decoration: underline;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text a:hover {
@@ -527,8 +524,8 @@
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text th,
@@ -536,8 +533,8 @@
     border: 1px solid var(--SmartThemeBorderColor);
     padding: 8px 12px;
     text-align: left;
-    font-family: inherit !important;
-    font-size: inherit !important;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .swipe-text-content.mes_text th {
