@@ -420,7 +420,8 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
         return `
             <div class="swipe-text-container single-view">
                 <div class="swipe-text-header">
-                    <button class="copy-btn" title="텍스트 복사">
+                    <label class="swipe-text-label">원문</label>
+                    <button class="copy-btn" title="원문 복사">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
