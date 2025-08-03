@@ -293,20 +293,24 @@ function parseMarkdown(text) {
 /**
  * 텍스트 복사하기
  */
-async function copyToClipboard(text, button) {
+async function copyToClipboard(button) {
     try {
-        // 마크다운 제거하고 순수 텍스트만 복사
-        const plainText = text.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+        // 버튼의 data-text 속성에서 원본 텍스트 가져오기
+        const originalText = button.getAttribute('data-text');
+        if (!originalText) {
+            console.error('복사할 텍스트가 없습니다.');
+            return;
+        }
         
-        await navigator.clipboard.writeText(plainText);
+        await navigator.clipboard.writeText(originalText);
         
         // 복사 완료 피드백
-        const originalText = button.innerHTML;
+        const originalIcon = button.innerHTML;
         button.innerHTML = '<i class="fa-solid fa-check"></i>';
         button.style.color = '#4CAF50';
         
         setTimeout(() => {
-            button.innerHTML = originalText;
+            button.innerHTML = originalIcon;
             button.style.color = '';
         }, 1500);
         
@@ -314,20 +318,21 @@ async function copyToClipboard(text, button) {
         console.error('클립보드 복사 실패:', err);
         
         // 폴백: 텍스트 선택
+        const originalText = button.getAttribute('data-text');
         const textArea = document.createElement('textarea');
-        textArea.value = text.replace(/<[^>]*>/g, '');
+        textArea.value = originalText;
         document.body.appendChild(textArea);
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
         
         // 복사 완료 피드백
-        const originalText = button.innerHTML;
+        const originalIcon = button.innerHTML;
         button.innerHTML = '<i class="fa-solid fa-check"></i>';
         button.style.color = '#4CAF50';
         
         setTimeout(() => {
-            button.innerHTML = originalText;
+            button.innerHTML = originalIcon;
             button.style.color = '';
         }, 1500);
     }
@@ -343,7 +348,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
         return `
             <div class="swipe-text-container single-view">
                 <div class="swipe-text-header">
-                    <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="텍스트 복사">
+                    <button class="copy-btn" data-text="${originalText.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" title="텍스트 복사">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
@@ -360,7 +365,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
                         <label class="swipe-text-label">원문</label>
-                        <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="원문 복사">
+                        <button class="copy-btn" data-text="${originalText.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" title="원문 복사">
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
@@ -385,7 +390,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                 <div class="swipe-text-container single-view">
                     <div class="swipe-text-header">
                         <label class="swipe-text-label">번역문</label>
-                        <button class="copy-btn" onclick="copyToClipboard('${translation.replace(/'/g, "\\'")}', this)" title="번역문 복사">
+                        <button class="copy-btn" data-text="${translation.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" title="번역문 복사">
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>
@@ -401,7 +406,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
                             <label class="swipe-text-label">원문</label>
-                            <button class="copy-btn" onclick="copyToClipboard('${originalText.replace(/'/g, "\\'")}', this)" title="원문 복사">
+                            <button class="copy-btn" data-text="${originalText.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" title="원문 복사">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
@@ -410,7 +415,7 @@ function createSwipeContentHTML(originalText, translation, hasTranslation) {
                     <div class="swipe-text-section">
                         <div class="swipe-text-header">
                             <label class="swipe-text-label">번역문</label>
-                            <button class="copy-btn" onclick="copyToClipboard('${translation.replace(/'/g, "\\'")}', this)" title="번역문 복사">
+                            <button class="copy-btn" data-text="${translation.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" title="번역문 복사">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
                         </div>
@@ -452,6 +457,11 @@ function setupPopupEventHandlers() {
     // 다음 스와이프 버튼
     modal.find('.swipe-next').on('click', () => {
         navigateSwipe(1);
+    });
+    
+    // 복사 버튼
+    modal.on('click', '.copy-btn', function() {
+        copyToClipboard(this);
     });
     
     // 뷰 모드 드롭다운 토글
@@ -619,9 +629,6 @@ function initializeSwipeViewer() {
     
     console.log(`[${pluginName}] 스와이프 뷰어 확장 초기화 완료!`);
 }
-
-// 전역 함수로 노출 (HTML onclick에서 사용)
-window.copyToClipboard = copyToClipboard;
 
 // jQuery 준비 완료 시 초기화
 jQuery(() => {
