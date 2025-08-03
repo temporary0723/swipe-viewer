@@ -383,7 +383,8 @@
     padding: 15px;
     background: var(--SmartThemeBlurTintColor);
     color: var(--SmartThemeBodyColor);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* SillyTavern 메시지 폰트 사용 (.mes_text와 동일한 폰트 시스템) */
+    font-family: var(--mainFontFamily);
     font-size: var(--mainFontSize);
     line-height: 1.6;
     box-sizing: border-box;
@@ -397,7 +398,7 @@
     word-wrap: break-word;
 }
 
-/* 마크다운 렌더링 요소 스타일 */
+/* 마크다운 렌더링 요소 스타일 (.mes_text와 유사한 스타일링) */
 .swipe-text-content h1,
 .swipe-text-content h2,
 .swipe-text-content h3,
@@ -407,6 +408,7 @@
     color: var(--SmartThemeBodyColor);
     margin: 1em 0 0.5em 0;
     font-weight: 600;
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content h1:first-child,
@@ -420,6 +422,8 @@
 
 .swipe-text-content p {
     margin: 0 0 1em 0;
+    font-family: var(--mainFontFamily);
+    font-size: var(--mainFontSize);
 }
 
 .swipe-text-content p:last-child {
@@ -430,12 +434,14 @@
 .swipe-text-content b {
     font-weight: 600;
     color: var(--SmartThemeBodyColor);
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content em, 
 .swipe-text-content i {
     font-style: italic;
     color: var(--SmartThemeBodyColor);
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content code {
@@ -443,8 +449,8 @@
     color: var(--SmartThemeQuoteColor);
     padding: 2px 4px;
     border-radius: 3px;
-    font-family: 'Courier New', Consolas, monospace;
-    font-size: 0.9em;
+    font-family: var(--monoFontFamily);
+    font-size: calc(var(--mainFontSize) * 0.9);
 }
 
 .swipe-text-content pre {
@@ -461,6 +467,7 @@
     background: none;
     padding: 0;
     color: inherit;
+    font-family: var(--monoFontFamily);
 }
 
 .swipe-text-content blockquote {
@@ -470,21 +477,26 @@
     color: var(--SmartThemeBodyColor);
     opacity: 0.9;
     font-style: italic;
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content ul,
 .swipe-text-content ol {
     margin: 1em 0;
     padding-left: 2em;
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content li {
     margin: 0.5em 0;
+    font-family: var(--mainFontFamily);
+    font-size: var(--mainFontSize);
 }
 
 .swipe-text-content a {
     color: var(--SmartThemeQuoteColor);
     text-decoration: underline;
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content a:hover {
@@ -495,6 +507,8 @@
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
+    font-family: var(--mainFontFamily);
+    font-size: var(--mainFontSize);
 }
 
 .swipe-text-content th,
@@ -502,6 +516,7 @@
     border: 1px solid var(--SmartThemeBorderColor);
     padding: 8px 12px;
     text-align: left;
+    font-family: var(--mainFontFamily);
 }
 
 .swipe-text-content th {
