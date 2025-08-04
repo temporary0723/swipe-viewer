@@ -73,11 +73,11 @@ function renderMarkdown(text) {
     if (!text) return '';
     
     try {
-        const converter = initMarkdownConverter();
-        let result = converter.makeHtml(text);
+        // 마크다운 변환 전에 쌍따옴표 처리 (안전한 방법)
+        let processedText = text.replace(/"([^"]+)"/g, '<span class="quote-text">"$1"</span>');
         
-        // 쌍따옴표로 감싼 "텍스트"에 인용 컬러 적용 (쌍따옴표 포함, 내용 수정 없음)
-        result = result.replace(/"([^"]+)"/g, '<span class="quote-text">"$1"</span>');
+        const converter = initMarkdownConverter();
+        const result = converter.makeHtml(processedText);
         
         return result;
     } catch (error) {
