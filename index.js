@@ -73,11 +73,14 @@ function renderMarkdown(text) {
     if (!text) return '';
     
     try {
-        // 마크다운 변환 전에 쌍따옴표 처리 (안전한 방법)
-        let processedText = text.replace(/"([^"]+)"/g, '<span class="quote-text">"$1"</span>');
-        
         const converter = initMarkdownConverter();
-        const result = converter.makeHtml(processedText);
+        let result = converter.makeHtml(text);
+        
+        // 쌍따옴표로 감싼 "텍스트"에 인용 컬러 적용 (쌍따옴표 포함, 내용 수정 없음)
+        result = result.replace(/"([^"]+)"/g, '<span class="quote-text">"$1"</span>');
+        
+        // HTML 태그 안의 쌍따옴표도 처리 (예: <code>"텍스트"</code>)
+        result = result.replace(/<code>"([^"]+)"<\/code>/g, '<code><span class="quote-text">"$1"</span></code>');
         
         return result;
     } catch (error) {

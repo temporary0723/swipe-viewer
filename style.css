@@ -468,7 +468,6 @@
     margin: 1em 0;
     color: var(--SmartThemeBodyColor);
     opacity: 0.9;
-    font-style: italic;
 }
 
 /* 쌍따옴표로 감싼 "텍스트" 스타일 */
