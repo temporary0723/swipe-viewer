@@ -8,8 +8,10 @@
 }
 
 .swipe-viewer-icon:hover {
-    background-color: var(--black30a);
-    color: var(--SmartThemeQuoteColor);
+    background-color: var(--SmartThemeQuoteColor);
+    color: var(--SmartThemeBlurTintColor);
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 .swipe-viewer-icon i {
