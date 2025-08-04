@@ -825,8 +825,7 @@
 
 /* 접근성 */
 .swipe-viewer-modal:focus-within {
-    outline: 2px solid var(--SmartThemeQuoteColor);
-    outline-offset: 2px;
+    /* 테두리 색상 효과 제거됨 */
 }
 
 /* 백드롭 클릭 영역 */
