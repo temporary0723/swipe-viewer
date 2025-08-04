@@ -43,7 +43,7 @@ const STORE_NAME = 'translations';
 // 메시지 버튼 HTML (스와이프 아이콘)
 const messageButtonHtml = `
     <div class="mes_button swipe-viewer-icon interactable" title="스와이프 보기" tabindex="0">
-        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        <i class="fa-solid fa-arrows-left-right"></i>
     </div>
 `;
 
