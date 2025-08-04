@@ -43,7 +43,7 @@ const STORE_NAME = 'translations';
 // 메시지 버튼 HTML (스와이프 아이콘)
 const messageButtonHtml = `
     <div class="mes_button swipe-viewer-icon interactable" title="스와이프 보기" tabindex="0">
-        <i class="fa-solid fa-arrows-left-right"></i>
+        <i class="fa-solid fa-book"></i>
     </div>
 `;
 
@@ -738,9 +738,43 @@ function initializeSwipeViewer() {
     // 기존 메시지에 아이콘 추가
     addSwipeViewerIconsToMessages();
     
+    // MutationObserver로 동적으로 추가되는 메시지 감지
+    const chatContainer = document.getElementById('chat');
+    if (chatContainer) {
+        const observer = new MutationObserver((mutations) => {
+            let hasNewMessages = false;
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE && 
+                            (node.classList.contains('mes') || node.querySelector('.mes'))) {
+                            hasNewMessages = true;
+                        }
+                    });
+                }
+            });
+            
+            if (hasNewMessages) {
+                // 아이콘 추가를 지연 실행하여 DOM이 완전히 준비된 후 실행
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        addSwipeViewerIconsToMessages();
+                    }, 50);
+                });
+            }
+        });
+        
+        observer.observe(chatContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
     // 이벤트 리스너 설정
     eventSource.on(event_types.MESSAGE_RECEIVED, handleMessageUpdate);
     eventSource.on(event_types.MESSAGE_SWIPED, handleMessageUpdate);
+    eventSource.on(event_types.MESSAGE_UPDATED, handleMessageUpdate);
+    eventSource.on(event_types.MORE_MESSAGES_LOADED, handleMessageUpdate);
     eventSource.on(event_types.CHAT_CHANGED, handleMessageUpdate);
     
     // 스와이프 뷰어 아이콘 클릭 이벤트
