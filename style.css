@@ -7,10 +7,6 @@
     border-radius: 3px;
 }
 
-.swipe-viewer-icon:hover {
-    color: var(--SmartThemeQuoteColor);
-}
-
 .swipe-viewer-icon i {
     font-size: 14px;
 }
